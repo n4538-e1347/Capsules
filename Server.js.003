@@ -1,0 +1,199 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const app = express();
+
+// Middleware
+app.use(bodyParser.json());
+
+// Connessione a MongoDB Atlas
+mongoose.connect('mongodb+srv://corradosinigoi:h2H3ZwUxDCKe98Yf@cluster0.6yvqs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
+
+// Schema Utente
+const userSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+    email: String,  // Nuovo campo email
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    resetPasswordToken: String,
+    resetPasswordExpires: Date
+});
+const User = mongoose.model('User', userSchema);
+
+
+// Schema Messaggio
+const messageSchema = new mongoose.Schema({
+    sender: String,
+    receiver: String,
+    message: String,
+    timestamp: { type: Date, default: Date.now }
+});
+const Message = mongoose.model('Message', messageSchema);
+
+// Rotta di Prova per la Radice
+app.get('/', (req, res) => {
+    res.send('Benvenuto al server di messaggistica!');
+});
+
+// API di Registrazione
+app.post('/register', async (req, res) => {
+    const { username, password, email } = req.body;
+    console.log(`Received data: ${JSON.stringify(req.body)}`);  // Logging dei dati ricevuti
+    try {
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).send('Utente già esistente');
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = new User({ username, password: hashedPassword, email });  // Salva l'email
+        await newUser.save();
+        res.status(201).send('Utente registrato con successo');
+    } catch (error) {
+        console.error('Errore nella registrazione:', error.message);  // Logging dell'errore
+        res.status(500).send(`Errore nella registrazione: ${error.message}`);
+    }
+});
+
+
+// API di Login
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    console.log(`Received data: ${JSON.stringify(req.body)}`);  // Logging dei dati ricevuti
+    try {
+        const user = await User.findOne({ username });
+        if (user && await bcrypt.compare(password, user.password)) {
+            res.status(200).send('Login effettuato con successo');
+        } else {
+            res.status(400).send('Username o password non corretti');
+        }
+    } catch (error) {
+        console.error('Errore nel login:', error.message);  // Logging dell'errore
+        res.status(500).send(`Errore nel login: ${error.message}`);
+    }
+});
+
+// API per Richiedere il Reset della Password
+app.post('/requestPasswordReset', async (req, res) => {
+    const { email } = req.body;  // Cambia da username a email
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).send('Utente non trovato');
+        }
+
+        const token = crypto.randomBytes(20).toString('hex');
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
+        await user.save();
+
+        // Configura nodemailer per inviare email
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: 'capsules.cs@gmail.com',
+                pass: 'ogtw ofka smvr zuab'
+            }
+        });
+
+        const mailOptions = {
+            to: user.email,  // Usa l'email dell'utente
+            from: 'passwordreset@demo.com',
+            subject: 'Reset della Password',
+            text: `Hai richiesto un reset della password. Clicca sul seguente link per completare il processo: \n\n
+                   http://${req.headers.host}/reset/${token} \n\n`
+        };
+
+        transporter.sendMail(mailOptions, (error, response) => {
+            if (error) {
+                console.error('Errore durante l\'invio dell\'email:', error);
+                res.status(500).send('Errore durante l\'invio dell\'email');
+            } else {
+                res.status(200).send('Email di reset della password inviata con successo');
+            }
+        });
+    } catch (error) {
+        res.status(500).send('Errore nella richiesta di reset della password');
+    }
+});
+
+// API per Reset della Password
+app.post('/resetPassword', async (req, res) => {
+    const { token, newPassword } = req.body;
+    try {
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+        if (!user) {
+            return res.status(400).send('Token non valido o scaduto');
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        res.status(200).send('Password resettata con successo');
+    } catch (error) {
+        res.status(500).send('Errore nel reset della password');
+    }
+});
+
+// API per l'Invio dei Messaggi
+app.post('/sendMessage', async (req, res) => {
+    const { sender, receiver, message } = req.body;
+    try {
+        const user = await User.findOne({ username: sender }).populate('friends');
+        const friend = user.friends.find(friend => friend.username === receiver);
+        if (friend) {
+            const newMessage = new Message({ sender, receiver, message });
+            await newMessage.save();
+            res.status(201).send('Messaggio inviato con successo');
+        } else {
+            res.status(403).send('Il destinatario non è tra i tuoi amici');
+        }
+    } catch (error) {
+        console.error(`Errore nell'invio del messaggio: ${error.message}`);
+        res.status(500).send(`Errore nell'invio del messaggio: ${error.message}`);
+    }
+});
+
+// API per Aggiungere Amici
+app.post('/addFriend', async (req, res) => {
+    const { username, friendUsername } = req.body;
+    try {
+        const user = await User.findOne({ username });
+        const friend = await User.findOne({ username: friendUsername });
+        if (user && friend) {
+            user.friends.push(friend._id);
+            await user.save();
+            res.status(200).send('Amico aggiunto con successo');
+        } else {
+            res.status(404).send('Utente non trovato');
+        }
+    } catch (error) {
+        console.error(`Errore nell'aggiunta dell'amico: ${error.message}`);
+        res.status(500).send(`Errore nell'aggiunta dell'amico: ${error.message}`);
+    }
+});
+
+// API per la Ricezione dei Messaggi
+app.get('/messages/:username', async (req, res) => {
+    const { username } = req.params;
+    try {
+        const messages = await Message.find({ receiver: username });
+        res.status(200).json(messages);
+    } catch (error) {
+        res.status(500).send('Errore nel recupero dei messaggi');
+    }
+});
+
+// Avvio del Server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server in esecuzione sulla porta ${PORT}`);
+});

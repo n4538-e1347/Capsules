@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset della Password</title>
+</head>
+<body>
+    <h1>Reset della Password</h1>
+    <form action="/resetPassword" method="POST">
+        <input type="hidden" name="token" value="<%= token %>" />
+        <label for="newPassword">Nuova Password:</label>
+        <input type="password" name="newPassword" id="newPassword" required />
+        <button type="submit">Reset Password</button>
+    </form>
+    <script>
+        const tokenValue = document.querySelector('input[name="token"]').value;
+        console.log("Token nel modulo:", tokenValue);  // Logging del token nel modulo
+    </script>
+</body>
+</html>
