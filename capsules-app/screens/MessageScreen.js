@@ -2,33 +2,47 @@ import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, FlatList, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
+import { Picker } from '@react-native-picker/picker'; // Importa Picker
 import { AuthContext } from '../contexts/AuthContext';
 
 export default function MessageScreen({ navigation }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const { isAuthenticated } = useContext(AuthContext);
-  const username = 'yourUsername'; // Dovrebbe essere l'username dell'utente loggato
+  const [friends, setFriends] = useState([]);
+  const [selectedFriend, setSelectedFriend] = useState('');
+  const { user } = useContext(AuthContext); // Assicuriamoci di ottenere l'username corretto
   const scaleValue = useState(new Animated.Value(1))[0];
 
   useEffect(() => {
-    fetchMessages();
+    if (user && user.username) {
+      fetchMessages();
+      fetchFriends();
+    }
   }, []);
 
   const fetchMessages = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.14:3000/messages/${username}`);
+      const response = await axios.get(`http://192.168.1.14:3000/messages/${user.username}`);
       setMessages(response.data);
     } catch (error) {
       alert(`Errore nel recupero dei messaggi: ${error.message}`);
     }
   };
 
+  const fetchFriends = async () => {
+    try {
+      const response = await axios.get(`http://192.168.1.14:3000/contacts/${user.username}`);
+      setFriends(response.data);
+    } catch (error) {
+      alert(`Errore nel recupero degli amici: ${error.message}`);
+    }
+  };
+
   const sendMessage = async () => {
     try {
       const response = await axios.post('http://192.168.1.14:3000/sendMessage', {
-        sender: username,
-        receiver: 'receiverUsername', // Sostituire con il destinatario effettivo
+        sender: user.username,
+        receiver: selectedFriend, // Usa il destinatario selezionato
         message: newMessage
       });
       if (response.status === 201) {
@@ -53,9 +67,20 @@ export default function MessageScreen({ navigation }) {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.title}>Messaggi</Text>
+        <Picker
+          selectedValue={selectedFriend}
+          style={styles.picker}
+          itemStyle={styles.pickerItem}
+          onValueChange={(itemValue) => setSelectedFriend(itemValue)}
+        >
+          <Picker.Item label="Seleziona un amico" value="" />
+          {friends.map((friend) => (
+            <Picker.Item key={friend.username} label={friend.username} value={friend.username} />
+          ))}
+        </Picker>
         <View style={styles.inputContainer}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { marginTop: 20 }]} // Sposta l'input messaggio più in basso
             placeholder="Scrivi un messaggio"
             value={newMessage}
             onChangeText={setNewMessage}
@@ -112,10 +137,28 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
   },
+  picker: {
+    height: 60, // Aumenta l'altezza del picker
+    width: '80%',
+    marginBottom: 20, // Spazio tra il picker e l'input
+    backgroundColor: '#32CD32', // Verde per il picker
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10, // Arrotonda gli angoli del picker
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  pickerItem: {
+    color: 'white', // Colore del testo
+    fontWeight: 'bold', // Testo in grassetto
+  },
   inputContainer: {
     width: '80%',
     alignItems: 'center', // Centra verticalmente
-    marginBottom: 20, // Spazio dal titolo
+    marginBottom: 20, // Spazio dal picker
   },
   input: {
     width: '100%',
