@@ -2,16 +2,17 @@ import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, FlatList, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import { Picker } from '@react-native-picker/picker'; // Importa Picker
+import DropDownPicker from 'react-native-dropdown-picker'; // Importa DropDownPicker
 import { AuthContext } from '../contexts/AuthContext';
 
 export default function MessageScreen({ navigation }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [friends, setFriends] = useState([]);
-  const [selectedFriend, setSelectedFriend] = useState('');
+  const [selectedFriend, setSelectedFriend] = useState(null);
   const { user } = useContext(AuthContext); // Assicuriamoci di ottenere l'username corretto
   const scaleValue = useState(new Animated.Value(1))[0];
+  const [open, setOpen] = useState(false); // Stato per controllare l'apertura del menu a tendina
 
   useEffect(() => {
     if (user && user.username) {
@@ -32,7 +33,7 @@ export default function MessageScreen({ navigation }) {
   const fetchFriends = async () => {
     try {
       const response = await axios.get(`http://192.168.1.14:3000/contacts/${user.username}`);
-      setFriends(response.data);
+      setFriends(response.data.map(friend => ({ label: friend.username, value: friend.username }))); // Formatta i dati per DropDownPicker
     } catch (error) {
       alert(`Errore nel recupero degli amici: ${error.message}`);
     }
@@ -67,17 +68,18 @@ export default function MessageScreen({ navigation }) {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.title}>Messaggi</Text>
-        <Picker
-          selectedValue={selectedFriend}
-          style={styles.picker}
-          itemStyle={styles.pickerItem}
-          onValueChange={(itemValue) => setSelectedFriend(itemValue)}
-        >
-          <Picker.Item label="Seleziona un amico" value="" />
-          {friends.map((friend) => (
-            <Picker.Item key={friend.username} label={friend.username} value={friend.username} />
-          ))}
-        </Picker>
+        <DropDownPicker
+          open={open}
+          value={selectedFriend}
+          items={friends}
+          setOpen={setOpen}
+          setValue={setSelectedFriend}
+          setItems={setFriends}
+          placeholder="Seleziona un amico"
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropdownContainer}
+          labelStyle={styles.dropdownLabel}
+        />
         <View style={styles.inputContainer}>
           <TextInput
             style={[styles.input, { marginTop: 20 }]} // Sposta l'input messaggio più in basso
@@ -137,28 +139,36 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
   },
-  picker: {
-    height: 60, // Aumenta l'altezza del picker
+  dropdown: {
+    height: 60,
     width: '80%',
-    marginBottom: 20, // Spazio tra il picker e l'input
-    backgroundColor: '#32CD32', // Verde per il picker
+    backgroundColor: '#32CD32', // Verde per il dropdown
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 10, // Arrotonda gli angoli del picker
+    borderRadius: 10, // Arrotonda gli angoli del dropdown
+    alignSelf: 'center', // Centra orizzontalmente
+  },
+  dropdownContainer: {
+    width: '80%',
+    backgroundColor: '#32CD32', // Verde per il contenitore dropdown
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10, // Arrotonda gli angoli del contenitore dropdown
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
+    alignSelf: 'center', // Centra orizzontalmente
   },
-  pickerItem: {
-    color: 'white', // Colore del testo
+  dropdownLabel: {
+    color: '#fff', // Colore del testo bianco
     fontWeight: 'bold', // Testo in grassetto
   },
   inputContainer: {
     width: '80%',
     alignItems: 'center', // Centra verticalmente
-    marginBottom: 20, // Spazio dal picker
+    marginBottom: 20, // Spazio dal dropdown
   },
   input: {
     width: '100%',
