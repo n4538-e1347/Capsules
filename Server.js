@@ -174,7 +174,7 @@ app.post('/resetPassword', async (req, res) => {
         });
         if (!user) {
             console.error('Token non valido o scaduto');
-            return res.status(400).send('Token non valido o scaduto');
+            return res.status(400).json({ error: 'Token non valido o scaduto' });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -183,10 +183,10 @@ app.post('/resetPassword', async (req, res) => {
         user.resetPasswordExpires = undefined;
         await user.save();
 
-        res.status(200).send('Password resettata con successo');
+        res.status(200).json({ message: 'Password resettata con successo' });
     } catch (error) {
         console.error('Errore nel reset della password:', error.message);
-        res.status(500).send('Errore nel reset della password');
+        res.status(500).json({ error: 'Errore nel reset della password' });
     }
 });
 

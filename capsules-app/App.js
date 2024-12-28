@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { BackHandler, Alert, SafeAreaView, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -19,26 +20,58 @@ import ResetPasswordScreen from './screens/ResetPasswordScreen';
 const Stack = createStackNavigator();
 
 export default function App() {
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert("Attenzione!", "Vuoi davvero uscire dall'app?", [
+        {
+          text: "No",
+          onPress: () => null,
+          style: "cancel"
+        },
+        { text: "Sì", onPress: () => BackHandler.exitApp() }
+      ]);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
   return (
     <AuthProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Landing">
-            <Stack.Screen name="Landing" component={LandingScreen} />
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-            <Stack.Screen name="Messages" component={MessageScreen} />
-            <Stack.Screen name="SendFriendRequest" component={SendFriendRequestScreen} />
-            <Stack.Screen name="PendingFriendRequests" component={PendingFriendRequestsScreen} />
-            <Stack.Screen name="ConfirmFriendRequest" component={ConfirmFriendRequestScreen} />
-            <Stack.Screen name="FriendsList" component={FriendsListScreen} />
-            <Stack.Screen name="Profile" component={ProfileScreen} />
-            <Stack.Screen name="RequestPasswordReset" component={RequestPasswordResetScreen} />
-            <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-          </Stack.Navigator>
+          <SafeAreaView style={styles.container}>
+            <Stack.Navigator 
+              initialRouteName="Landing" 
+              screenOptions={{ headerShown: false }}
+            >
+              <Stack.Screen name="Landing" component={LandingScreen} />
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="Register" component={RegisterScreen} />
+              <Stack.Screen name="Messages" component={MessageScreen} />
+              <Stack.Screen name="SendFriendRequest" component={SendFriendRequestScreen} />
+              <Stack.Screen name="PendingFriendRequests" component={PendingFriendRequestsScreen} />
+              <Stack.Screen name="ConfirmFriendRequest" component={ConfirmFriendRequestScreen} />
+              <Stack.Screen name="FriendsList" component={FriendsListScreen} />
+              <Stack.Screen name="Profile" component={ProfileScreen} />
+              <Stack.Screen name="RequestPasswordReset" component={RequestPasswordResetScreen} />
+              <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+            </Stack.Navigator>
+          </SafeAreaView>
         </NavigationContainer>
       </GestureHandlerRootView>
     </AuthProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

@@ -4,16 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset della Password</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFFACD; /* Colore di sfondo giallo pallido */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            margin-bottom: 5px;
+        }
+        input[type="password"] {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button[type="submit"] {
+            background-color: #32CD32; /* Verde */
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s ease-in-out;
+        }
+        button[type="submit"]:hover {
+            background-color: #28a745; /* Colore verde scuro al passaggio del mouse */
+        }
+        button[type="submit"]:active {
+            transform: scale(0.9); /* Effetto di riduzione al click */
+        }
+    </style>
 </head>
 <body>
     <h1>Reset della Password</h1>
-    <form action="/resetPassword" method="POST">
+    <form id="resetForm">
         <input type="hidden" name="token" value="<%= token %>" />
         <label for="newPassword">Nuova Password:</label>
         <input type="password" name="newPassword" id="newPassword" required />
         <button type="submit">Reset Password</button>
     </form>
     <script>
+        const form = document.getElementById('resetForm');
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const token = document.querySelector('input[name="token"]').value;
+            const newPassword = document.querySelector('input[name="newPassword"]').value;
+
+            const response = await fetch('/resetPassword', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token, newPassword }),
+            });
+
+            if (response.ok) {
+                alert('Password resettata con successo. Puoi chiudere questa pagina.');
+                window.close();  // Chiude la pagina web
+            } else {
+                const errorText = await response.text();
+                alert(`Errore: ${errorText}`);
+            }
+        });
+
         const tokenValue = document.querySelector('input[name="token"]').value;
         console.log("Token nel modulo:", tokenValue);  // Logging del token nel modulo
     </script>

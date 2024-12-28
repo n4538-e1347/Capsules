@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { SafeAreaView, View, Text, FlatList, StyleSheet, Modal, TouchableOpacity, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
@@ -10,20 +10,19 @@ export default function FriendsListScreen({ navigation }) {
   const [blockedUsers, setBlockedUsers] = useState([]);
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const scaleValue = useState(new Animated.Value(1))[0];
 
   useEffect(() => {
     const fetchFriendsAndBlockedUsers = async () => {
       try {
         const friendsResponse = await axios.get(`http://192.168.1.14:3000/contacts/${user.username}`);
         setFriends(friendsResponse.data);
-
         const blockedUsersResponse = await axios.get(`http://192.168.1.14:3000/blockedUsers/${user.username}`);
         setBlockedUsers(blockedUsersResponse.data);
       } catch (error) {
         alert(`Errore di connessione: ${error.message}`);
       }
     };
-
     fetchFriendsAndBlockedUsers();
   }, [user.username]);
 
@@ -31,10 +30,9 @@ export default function FriendsListScreen({ navigation }) {
     if (showConfirmation) {
       const timer = setTimeout(() => {
         setShowConfirmation(false);
-        navigation.navigate('Profile');  // Naviga alla pagina del profilo dopo 2,5 secondi
+        navigation.navigate('Profile'); // Naviga alla pagina del profilo dopo 2,5 secondi
       }, 2500);
-
-      return () => clearTimeout(timer);  // Cleanup il timer
+      return () => clearTimeout(timer); // Cleanup il timer
     }
   }, [showConfirmation, navigation]);
 
@@ -79,58 +77,105 @@ export default function FriendsListScreen({ navigation }) {
     }
   };
 
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(scaleValue, {
+        toValue: 0.9,
+        duration: 100,
+        useNativeDriver: true
+      }),
+      Animated.timing(scaleValue, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true
+      })
+    ]).start();
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Elenco degli Amici</Text>
-      <FlatList 
-        data={friends}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View style={styles.friendItem}>
-            <Text>{item.username}</Text>
-            <TouchableOpacity onPress={() => handleRemoveFriend(item.username)} style={styles.iconButton}>
-              <Icon name="user-times" size={20} color="red" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleRemoveFriend(item.username, true)} style={styles.iconButton}>
-              <Icon name="ban" size={20} color="black" />
-            </TouchableOpacity>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Elenco degli Amici</Text>
+        <FlatList
+          data={friends}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <View style={styles.friendItem}>
+              <Text>{item.username}</Text>
+              <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+                <TouchableOpacity
+                  onPress={() => { animateButton(); handleRemoveFriend(item.username); }}
+                  style={styles.iconButton}
+                >
+                  <Icon name="user-times" size={20} color="red" />
+                </TouchableOpacity>
+              </Animated.View>
+              <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+                <TouchableOpacity
+                  onPress={() => { animateButton(); handleRemoveFriend(item.username, true); }}
+                  style={styles.iconButton}
+                >
+                  <Icon name="ban" size={20} color="black" />
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+          )}
+        />
+        <Text style={styles.title}>Utenti Bloccati</Text>
+        <FlatList
+          data={blockedUsers}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <View style={styles.friendItem}>
+              <Text>{item.username}</Text>
+              <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+                <TouchableOpacity
+                  onPress={() => { animateButton(); handleUnblockUser(item.username); }}
+                  style={styles.iconButton}
+                >
+                  <Icon name="unlock" size={20} color="green" />
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+          )}
+        />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showConfirmation}
+          onRequestClose={() => { setShowConfirmation(false); }}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{confirmationMessage}</Text>
+            </View>
           </View>
-        )}
-      />
-      <Text style={styles.title}>Utenti Bloccati</Text>
-      <FlatList 
-        data={blockedUsers}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View style={styles.friendItem}>
-            <Text>{item.username}</Text>
-            <TouchableOpacity onPress={() => handleUnblockUser(item.username)} style={styles.iconButton}>
-              <Icon name="unlock" size={20} color="green" />
+        </Modal>
+        <View style={styles.bottomContainer}>
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => { animateButton(); navigation.goBack(); }}
+            >
+              <Text>
+                <Icon name="arrow-left" size={24} color="#FFF" /> {/* Icona back */}
+              </Text>
             </TouchableOpacity>
-          </View>
-        )}
-      />
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showConfirmation}
-        onRequestClose={() => {
-          setShowConfirmation(false);
-        }}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>{confirmationMessage}</Text>
-          </View>
+          </Animated.View>
         </View>
-      </Modal>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFACD', // Colore di sfondo giallo pallido
+  },
   container: {
     flex: 1,
+    paddingTop: 40, // Aumenta il padding per spostare il testo "Elenco degli Amici" più in basso
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -146,6 +191,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#FFF', // Colore di sfondo per gli elementi della lista
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   iconButton: {
     marginLeft: 10,
@@ -163,10 +214,7 @@ const styles = StyleSheet.create({
     padding: 35,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
@@ -174,5 +222,42 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  button: {
+    backgroundColor: '#32CD32', // Verde
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    justifyContent: 'center', // Centra verticalmente
+    alignItems: 'center', // Centra orizzontalmente
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+    width: 150, // Larghezza fissa per i pulsanti
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+    bottomContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+  },
+  backButton: {
+    backgroundColor: '#32CD32', // Verde
+    borderRadius: 50, // Pulsante rotondo
+    width: 60,
+    height: 60,
+    justifyContent: 'center', // Centra verticalmente
+    alignItems: 'center', // Centra orizzontalmente
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
 });

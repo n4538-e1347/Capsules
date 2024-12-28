@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { SafeAreaView, View, Text, FlatList, StyleSheet, Modal, TouchableOpacity, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
@@ -11,6 +11,7 @@ export default function PendingFriendRequestsScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState('');
   const [messageModalVisible, setMessageModalVisible] = useState(false);
+  const scaleValue = useState(new Animated.Value(1))[0];
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -97,6 +98,13 @@ export default function PendingFriendRequestsScreen({ navigation }) {
     }
   };
 
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(scaleValue, { toValue: 0.9, duration: 100, useNativeDriver: true }),
+      Animated.timing(scaleValue, { toValue: 1, duration: 100, useNativeDriver: true })
+    ]).start();
+  };
+
   const renderRequestItem = (item, type) => (
     <TouchableOpacity onPress={() => showMessage(item.message)}>
       <View style={styles.requestItem}>
@@ -105,21 +113,29 @@ export default function PendingFriendRequestsScreen({ navigation }) {
           {item.message && <Icon name="envelope" size={20} color="blue" style={styles.messageIcon} />}
         </View>
         {type === 'sent' && (
-          <TouchableOpacity onPress={() => handleWithdrawRequest(item.username)}>
-            <Icon name="undo" size={20} color="gray" />
-          </TouchableOpacity>
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <TouchableOpacity onPress={() => { animateButton(); handleWithdrawRequest(item.username); }}>
+              <Icon name="undo" size={20} color="gray" />
+            </TouchableOpacity>
+          </Animated.View>
         )}
         {type === 'received' && (
           <>
-            <TouchableOpacity onPress={() => handleAcceptRequest(item.userId.username)}>
-              <Icon name="check-circle" size={20} color="green" style={styles.actionIcon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleRejectRequest(item.userId.username)}>
-              <Icon name="times-circle" size={20} color="red" style={styles.actionIcon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleRejectRequest(item.userId.username, true)}>
-              <Icon name="ban" size={20} color="black" style={styles.actionIcon} />
-            </TouchableOpacity>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity onPress={() => { animateButton(); handleAcceptRequest(item.userId.username); }}>
+                <Icon name="check-circle" size={20} color="green" style={styles.actionIcon} />
+              </TouchableOpacity>
+            </Animated.View>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity onPress={() => { animateButton(); handleRejectRequest(item.userId.username); }}>
+                <Icon name="times-circle" size={20} color="red" style={styles.actionIcon} />
+              </TouchableOpacity>
+            </Animated.View>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity onPress={() => { animateButton(); handleRejectRequest(item.userId.username, true); }}>
+                <Icon name="ban" size={20} color="black" style={styles.actionIcon} />
+              </TouchableOpacity>
+            </Animated.View>
           </>
         )}
       </View>
@@ -127,57 +143,76 @@ export default function PendingFriendRequestsScreen({ navigation }) {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Richieste di Amicizia Inviate</Text>
-      <FlatList 
-        data={sentRequests}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => renderRequestItem(item, 'sent')}
-      />
-      <Text style={styles.title}>Richieste di Amicizia Ricevute</Text>
-      <FlatList 
-        data={friendRequests}
-        keyExtractor={(item) => item.userId._id}
-        renderItem={({ item }) => renderRequestItem(item, 'received')}
-      />
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-        }}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>{selectedMessage}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Richieste di Amicizia Inviate</Text>
+        <FlatList 
+          data={sentRequests}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => renderRequestItem(item, 'sent')}
+        />
+        <Text style={styles.title}>Richieste di Amicizia Ricevute</Text>
+        <FlatList 
+          data={friendRequests}
+          keyExtractor={(item) => item.userId._id}
+          renderItem={({ item }) => renderRequestItem(item, 'received')}
+        />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(false);
+          }}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{selectedMessage}</Text>
+            </View>
           </View>
-        </View>
-      </Modal>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={messageModalVisible}
-        onRequestClose={() => {
-          setMessageModalVisible(false);
-        }}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>{selectedMessage}</Text>
-            <TouchableOpacity onPress={() => setMessageModalVisible(false)} style={styles.button}>
-              <Text style={styles.buttonText}>OK</Text>
+        </Modal>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={messageModalVisible}
+          onRequestClose={() => {
+            setMessageModalVisible(false);
+          }}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{selectedMessage}</Text>
+              <TouchableOpacity onPress={() => setMessageModalVisible(false)} style={styles.button}>
+                <Text style={styles.buttonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        <View style={styles.bottomContainer}>
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => { animateButton(); navigation.goBack(); }}
+            >
+              <Text>
+                <Icon name="arrow-left" size={24} color="#FFF" />  {/* Icona back */}
+              </Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </View>
-      </Modal>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFACD', // Colore di sfondo giallo pallido
+  },
   container: {
     flex: 1,
+    paddingTop: 40, // Aggiungi padding per evitare sovrapposizioni con la status bar
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -193,6 +228,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#FFF', // Colore di sfondo per gli elementi della lista
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   usernameContainer: {
     flexDirection: 'row',
@@ -200,13 +241,13 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 16,
-    marginRight: 20,  // Aggiungi spazio tra il nome e l'icona
+    marginRight: 20, // Aggiungi spazio tra il nome e l'icona
   },
   messageIcon: {
-    marginRight: 20,  // Aggiungi spazio tra l'icona e i pulsanti
+    marginRight: 20, // Aggiungi spazio tra l'icona e i pulsanti
   },
   actionIcon: {
-    marginLeft: 20,  // Aggiungi spazio tra le icone delle azioni
+    marginLeft: 20, // Aggiungi spazio tra le icone delle azioni
   },
   centeredView: {
     flex: 1,
@@ -234,14 +275,40 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#32CD32', // Verde
     borderRadius: 20,
-    padding: 10,
-    marginTop: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    justifyContent: 'center', // Centra verticalmente
+    alignItems: 'center', // Centra orizzontalmente
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+    width: 150, // Larghezza fissa per i pulsanti
   },
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  bottomContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+  },
+  backButton: {
+    backgroundColor: '#32CD32', // Verde
+    borderRadius: 50, // Pulsante rotondo
+    width: 60,
+    height: 60,
+    justifyContent: 'center', // Centra verticalmente
+    alignItems: 'center', // Centra orizzontalmente
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
 });

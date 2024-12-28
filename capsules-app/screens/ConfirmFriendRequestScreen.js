@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { SafeAreaView, View, Text, Button, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import axios from 'axios';
+import Icon from 'react-native-vector-icons/FontAwesome'; // Importa l'icona
 
 export default function ConfirmFriendRequestScreen({ route, navigation }) {
   const { username, friendUsername } = route.params;
+  const scaleValue = useState(new Animated.Value(1))[0];
 
   const handleConfirmRequest = async () => {
     try {
@@ -19,15 +21,40 @@ export default function ConfirmFriendRequestScreen({ route, navigation }) {
     }
   };
 
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(scaleValue, { toValue: 0.9, duration: 100, useNativeDriver: true }),
+      Animated.timing(scaleValue, { toValue: 1, duration: 100, useNativeDriver: true })
+    ]).start();
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Confermare Amicizia con {friendUsername}</Text>
-      <Button title="Conferma" onPress={handleConfirmRequest} />
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Confermare Amicizia con {friendUsername}</Text>
+        <Button title="Conferma" onPress={handleConfirmRequest} />
+        <View style={styles.bottomContainer}>
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => { animateButton(); navigation.goBack(); }}
+            >
+              <Text>
+                <Icon name="arrow-left" size={24} color="#FFF" />  {/* Icona back */}
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFACD', // Colore di sfondo giallo pallido
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -36,5 +63,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
+  },
+  bottomContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+  },
+  backButton: {
+    backgroundColor: '#32CD32', // Verde
+    borderRadius: 50, // Pulsante rotondo
+    width: 60,
+    height: 60,
+    justifyContent: 'center', // Centra verticalmente
+    alignItems: 'center', // Centra orizzontalmente
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
 });
