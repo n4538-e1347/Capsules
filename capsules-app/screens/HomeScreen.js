@@ -68,7 +68,7 @@ export default function HomeScreen({ navigation }) {
           onPress={() => { animateButton(); navigation.navigate('ArchivedMessagesScreen'); }} // Naviga a ArchivedMessagesScreen
         >
           <Text style={styles.iconWrapper}>
-            <Icon name="envelope-open" size={24} color="#FFF" /> {/* Icona busta bianca aperta */}
+            <Icon name="envelope-open" size={24} color="#FFF" style={styles.icon} /> {/* Icona busta bianca aperta */}
           </Text>
         </TouchableOpacity>
         <Text style={[styles.title, { marginTop: 60 }]}>Welcome to Capsules!</Text>
@@ -90,8 +90,8 @@ export default function HomeScreen({ navigation }) {
                 style={[styles.roundButton, styles.bottomButton]}
                 onPress={() => { animateButton(); navigation.navigate('Profile'); }}
               >
-                <Text>
-                  <Icon name="user" size={24} color="#FFF" />
+                <Text style={styles.iconWrapper}>
+                  <Icon name="user" size={24} color="#FFF" style={styles.icon} />
                 </Text>
               </TouchableOpacity>
             </Animated.View>
@@ -108,8 +108,8 @@ export default function HomeScreen({ navigation }) {
                 style={[styles.roundButton, styles.bottomButton]}
                 onPress={() => { animateButton(); handleLogout(); }}
               >
-                <Text>
-                  <Icon name="sign-out" size={24} color="#FFF" />
+                <Text style={styles.iconWrapper}>
+                  <Icon name="sign-out" size={24} color="#FFF" style={styles.icon} />
                 </Text>
               </TouchableOpacity>
             </Animated.View>
@@ -194,8 +194,11 @@ const styles = StyleSheet.create({
     width: '100%', // Assicura che l'icona occupi l'intera area del pulsante
     height: '100%',
   },
+  icon: {
+    alignSelf: 'center', // Allinea l'icona al centro orizzontalmente
+  },
   bottomButton: {
-    marginTop: 20, // Allineamento dei pulsanti in basso
+    alignItems: 'center', // Allineamento centrale
   },
   rectangleButton: {
     backgroundColor: '#32CD32', // Verde
