@@ -1,12 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, FlatList, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, TextInput, StyleSheet, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import DropDownPicker from 'react-native-dropdown-picker'; // Importa DropDownPicker
 import { AuthContext } from '../contexts/AuthContext';
 
 export default function MessageScreen({ navigation }) {
-  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [friends, setFriends] = useState([]);
   const [selectedFriend, setSelectedFriend] = useState(null);
@@ -16,19 +15,9 @@ export default function MessageScreen({ navigation }) {
 
   useEffect(() => {
     if (user && user.username) {
-      fetchMessages();
       fetchFriends();
     }
   }, []);
-
-  const fetchMessages = async () => {
-    try {
-      const response = await axios.get(`http://192.168.1.14:3000/messages/${user.username}`);
-      setMessages(response.data);
-    } catch (error) {
-      alert(`Errore nel recupero dei messaggi: ${error.message}`);
-    }
-  };
 
   const fetchFriends = async () => {
     try {
@@ -47,8 +36,7 @@ export default function MessageScreen({ navigation }) {
         message: newMessage
       });
       if (response.status === 201) {
-        fetchMessages(); // Aggiorna i messaggi dopo l'invio
-        setNewMessage('');
+        setNewMessage(''); // Pulisci il campo del messaggio dopo l'invio
       } else {
         alert('Errore nell\'invio del messaggio. Per favore, riprova.');
       }
@@ -90,15 +78,6 @@ export default function MessageScreen({ navigation }) {
             multiline={true} // Permette il testo su più righe
           />
         </View>
-        <FlatList
-          data={messages}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <View style={styles.message}>
-              <Text>{item.sender}: {item.message}</Text>
-            </View>
-          )}
-        />
         <View style={styles.bottomContainer}>
           <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
             <TouchableOpacity
@@ -177,11 +156,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     textAlignVertical: 'top', // Allinea il testo in alto
     height: 200, // Aumenta l'altezza dell'input per contenere visivamente i 150 caratteri
-  },
-  message: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   bottomContainer: {
     flexDirection: 'row',

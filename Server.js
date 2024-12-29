@@ -43,16 +43,16 @@ const User = mongoose.model('User', userSchema);
 
 //module.exports = mongoose.model('User', userSchema);
 
-
-
 // Schema Messaggio
 const messageSchema = new mongoose.Schema({
     sender: String,
     receiver: String,
     message: String,
-    timestamp: { type: Date, default: Date.now }
+    timestamp: { type: Date, default: Date.now },
+    archived: { type: Boolean, default: false } // Aggiungi il campo archived
 });
 const Message = mongoose.model('Message', messageSchema);
+
 
 // Rotta di Prova per la Radice
 app.get('/', (req, res) => {
@@ -535,6 +535,16 @@ app.post('/deleteAccount', async (req, res) => {
     }
 });
 
+// API per Archiviare i Messaggi
+app.post('/archiveMessage', async (req, res) => {
+  const { messageId } = req.body;
+  try {
+    await Message.findByIdAndUpdate(messageId, { archived: true });
+    res.status(200).send('Message archived');
+  } catch (error) {
+    res.status(500).send('Error archiving message');
+  }
+});
 
 // API per Visualizzare le Richieste di Amicizia
 app.get('/friendRequests/:username', async (req, res) => {

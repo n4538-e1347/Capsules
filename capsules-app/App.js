@@ -16,6 +16,7 @@ import FriendsListScreen from './screens/FriendsListScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import RequestPasswordResetScreen from './screens/RequestPasswordResetScreen';
 import ResetPasswordScreen from './screens/ResetPasswordScreen';
+import ArchivedMessagesScreen from './screens/ArchivedMessagesScreen';
 
 const Stack = createStackNavigator();
 
@@ -62,6 +63,7 @@ export default function App() {
               <Stack.Screen name="Profile" component={ProfileScreen} />
               <Stack.Screen name="RequestPasswordReset" component={RequestPasswordResetScreen} />
               <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+			  <Stack.Screen name="ArchivedMessagesScreen" component={ArchivedMessagesScreen} />
             </Stack.Navigator>
           </SafeAreaView>
         </NavigationContainer>
