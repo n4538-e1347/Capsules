@@ -71,6 +71,14 @@ export default function HomeScreen({ navigation }) {
             <Icon name="envelope-open" size={24} color="#FFF" style={styles.icon} /> {/* Icona busta bianca aperta */}
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.roundButton, styles.topRightButton]}
+          onPress={() => { animateButton(); navigation.navigate('SettingsScreen'); }} // Naviga a SettingsScreen
+        >
+          <Text style={styles.iconWrapper}>
+            <Icon name="cog" size={24} color="#FFF" style={styles.icon} /> {/* Icona Settings */}
+          </Text>
+        </TouchableOpacity>
         <Text style={[styles.title, { marginTop: 60 }]}>Welcome to Capsules!</Text>
         <TouchableOpacity style={styles.largeButton} onPress={showRandomMessage}>
           <Text style={styles.buttonText}>Mostra Messaggio</Text>
@@ -153,6 +161,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 50, // Sposta il pulsante più in basso
     left: 20,
+  },
+  topRightButton: {
+    position: 'absolute',
+    top: 50, // Sposta il pulsante più in basso
+    right: 20,
   },
   title: {
     fontSize: 24,
