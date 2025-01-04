@@ -3,8 +3,10 @@ import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, FlatList, Anima
 import { AuthContext } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 export default function ArchivedMessagesScreen({ navigation }) {
+  const { t } = useTranslation();
   const { user } = useContext(AuthContext);
   const scaleValue = useState(new Animated.Value(1))[0];
   const [archivedMessages, setArchivedMessages] = useState([]);
@@ -20,7 +22,7 @@ export default function ArchivedMessagesScreen({ navigation }) {
       const response = await axios.get(`http://192.168.1.14:3000/messages/${user.username}`);
       setArchivedMessages(response.data.filter(msg => msg.archived)); // Filtra solo i messaggi archiviati
     } catch (error) {
-      alert(`Errore nel recupero dei messaggi archiviati: ${error.message}`);
+      alert(t('errorFetchingMessages', { error: error.message })); // Testo tradotto con variabile
     }
   };
 
@@ -34,7 +36,7 @@ export default function ArchivedMessagesScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={[styles.title, { marginTop: 60 }]}>Messaggi Archiviati</Text>
+        <Text style={[styles.title, { marginTop: 60 }]}>{t('archivedMessages')}</Text>
         <FlatList
           data={archivedMessages}
           keyExtractor={(item) => item._id}
@@ -64,7 +66,7 @@ export default function ArchivedMessagesScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFACD', // Colore di sfondo giallo pallido
+    backgroundColor: '#FFFACD',
   },
   container: {
     flex: 1,

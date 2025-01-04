@@ -3,11 +3,14 @@ import { SafeAreaView, View, Text, TextInput, TouchableOpacity, StyleSheet, Moda
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Importa l'icona
+import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
 
 export default function SendFriendRequestScreen({ navigation }) {
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
   const [friendUsername, setFriendUsername] = useState('');
   const [message, setMessage] = useState('');
-  const { user } = useContext(AuthContext);
+//  const { user } = useContext(AuthContext);
+  const { user, isAuthenticated, logout } = useContext(AuthContext);
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
   const scaleValue = useState(new Animated.Value(1))[0];
@@ -25,7 +28,7 @@ export default function SendFriendRequestScreen({ navigation }) {
 
   const handleSendRequest = async () => {
     if (!user || !user.username) {
-      setConfirmationMessage('Errore di autenticazione. Per favore, effettua nuovamente il login.');
+      setConfirmationMessage(t('authenticationError'));
       setShowConfirmation(true);
       return;
     }
@@ -33,7 +36,7 @@ export default function SendFriendRequestScreen({ navigation }) {
     const trimmedFriendUsername = friendUsername.trim(); // Trimma gli spazi dall'username dell'amico
 
     if (message.length > 100) {
-      setConfirmationMessage('Il messaggio non può superare i 100 caratteri.');
+      setConfirmationMessage(t('messageTooLong'));
       setShowConfirmation(true);
       return;
     }
@@ -41,10 +44,10 @@ export default function SendFriendRequestScreen({ navigation }) {
     try {
       const response = await axios.post('http://192.168.1.14:3000/sendFriendRequest', { username: user.username, friendUsername: trimmedFriendUsername, message });
       if (response.status === 200) {
-        setConfirmationMessage('Richiesta di amicizia inviata con successo');
+        setConfirmationMessage(t('friendRequestSentSuccess'));
         setShowConfirmation(true);
       } else {
-        setConfirmationMessage('Errore nell\'invio della richiesta di amicizia');
+        setConfirmationMessage(t('friendRequestSendError'));
         setShowConfirmation(true);
       }
     } catch (error) {
@@ -52,7 +55,7 @@ export default function SendFriendRequestScreen({ navigation }) {
         setConfirmationMessage(error.response.data);  // Mostra il messaggio di errore specifico
         setShowConfirmation(true);
       } else {
-        setConfirmationMessage(`Errore di connessione: ${error.message}`);
+        setConfirmationMessage(`${t('connectionError')}: ${error.message}`);
         setShowConfirmation(true);
       }
     }
@@ -68,16 +71,16 @@ export default function SendFriendRequestScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Invia Richiesta di Amicizia</Text>
+        <Text style={styles.title}>{t('sendFriendRequestTitle')}</Text>
         <TextInput 
           style={styles.input} 
-          placeholder="Username dell'Amico" 
+          placeholder={t('friendUsernamePlaceholder')} 
           value={friendUsername} 
           onChangeText={setFriendUsername} 
         />
         <TextInput 
           style={styles.input} 
-          placeholder="Messaggio di accompagnamento" 
+          placeholder={t('messagePlaceholder')} 
           value={message} 
           onChangeText={text => setMessage(text.slice(0, 100))}  // Limita i caratteri a 100
         />
@@ -86,7 +89,7 @@ export default function SendFriendRequestScreen({ navigation }) {
             style={styles.button}
             onPress={() => { animateButton(); handleSendRequest(); }}
           >
-            <Text style={styles.buttonText}>Invia Richiesta</Text>
+            <Text style={styles.buttonText}>{t('sendRequest')}</Text>
           </TouchableOpacity>
         </Animated.View>
         <Modal
@@ -103,18 +106,18 @@ export default function SendFriendRequestScreen({ navigation }) {
             </View>
           </View>
         </Modal>
-        <View style={styles.bottomContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => { animateButton(); navigation.goBack(); }}
-            >
-              <Text>
-                <Icon name="arrow-left" size={24} color="#FFF" />  {/* Icona back */}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
+		 <View style={styles.bottomContainer}>
+			<TouchableOpacity
+			 style={styles.backButton}
+			 onPress={() => navigation.goBack()}
+			>
+				<Text style={styles.iconWrapper}>
+					<Text>
+					  <Icon name="arrow-left" size={24} color="#FFF" />
+					</Text>
+				</Text>
+			</TouchableOpacity>
+		 </View>
       </View>
     </SafeAreaView>
   );

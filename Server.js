@@ -8,8 +8,8 @@ const path = require('path');
 const fs = require('fs');
 const app = express();
 const trimString = (str) => str.trim();
+//const Schema = mongoose.Schema;
 const Schema = mongoose.Schema;
-
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));  // Aggiungi questa linea per gestire i dati urlencoded
@@ -17,14 +17,14 @@ app.use(bodyParser.urlencoded({ extended: true }));  // Aggiungi questa linea pe
 // Connessione a MongoDB Atlas
 mongoose.connect('mongodb+srv://corradosinigoi:h2H3ZwUxDCKe98Yf@cluster0.6yvqs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
 
-// Schema Utente
-
+// Schema per le richieste di amicizia
 const friendRequestSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
     username: { type: String, required: true },
     message: { type: String, maxlength: 100 }
 });
 
+// Schema utente aggiornato con il campo lingua
 const userSchema = new Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -32,16 +32,16 @@ const userSchema = new Schema({
     friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     friendRequests: [friendRequestSchema],
     sentRequests: [friendRequestSchema],
-    blockedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Nuovo campo aggiunto
+    blockedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     resetPasswordToken: String,
-    resetPasswordExpires: Date
+    resetPasswordExpires: Date,
+    language: { type: String, default: 'en' }, // Campo lingua con valore di default
+	premium: { type: Boolean, default: false } // Campo premium con valore di default false
 });
-
-
 const User = mongoose.model('User', userSchema);
+// Esportazione del modello utente
+module.exports = User;
 
-
-//module.exports = mongoose.model('User', userSchema);
 
 // Schema Messaggio
 const messageSchema = new mongoose.Schema({
@@ -52,6 +52,20 @@ const messageSchema = new mongoose.Schema({
     archived: { type: Boolean, default: false } // Aggiungi il campo archived
 });
 const Message = mongoose.model('Message', messageSchema);
+
+
+// Script per aggiungere un campo agli utenti esistenti
+const addPremiumField = async () => {
+  try {
+    await User.updateMany({}, { $set: { premium: false } }); // Aggiungi il campo premium con valore predefinito false
+    console.log('Campo premium aggiunto con successo agli utenti esistenti.');
+    mongoose.connection.close();
+  } catch (error) {
+    console.error('Errore nell\'aggiornamento degli utenti:', error);
+  }
+};
+// Chiamare la funzione per aggiornare gli utenti esistenti
+//addPremiumField();
 
 
 // Rotta di Prova per la Radice
@@ -102,7 +116,12 @@ app.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ username });
         if (user && await bcrypt.compare(password, user.password)) {
-            res.status(200).send('Login effettuato con successo');
+            // Restituisci i dati utente completi al client
+            res.status(200).json({
+                username: user.username,
+                email: user.email,
+                language: user.language
+            });
         } else {
             res.status(400).send('Username o password non corretti');
         }
@@ -111,6 +130,7 @@ app.post('/login', async (req, res) => {
         res.status(500).send(`Errore nel login: ${error.message}`);
     }
 });
+
 
 
 // API per Richiedere il Reset della Password
@@ -546,6 +566,17 @@ app.post('/archiveMessage', async (req, res) => {
   }
 });
 
+// API per Aggiornare la Lingua
+app.post('/updateLanguage', async (req, res) => {
+  const { username, language } = req.body;
+  try {
+    await User.findOneAndUpdate({ username }, { language });
+    res.status(200).send('Lingua aggiornata con successo');
+  } catch (error) {
+    res.status(500).send('Errore nell\'aggiornamento della lingua');
+  }
+});
+
 // API per Visualizzare le Richieste di Amicizia
 app.get('/friendRequests/:username', async (req, res) => {
     const { username } = req.params;
@@ -610,12 +641,14 @@ app.get('/messages/:username', async (req, res) => {
 // Rotta per Servire la Pagina di Reset della Password
 app.get('/reset/:token', (req, res) => {
     const token = req.params.token;
+    const lang = req.query.lang || 'en'; // Imposta 'en' come lingua di default
+
     fs.readFile(path.join(__dirname, 'reset.html'), 'utf8', (err, data) => {
         if (err) {
             res.status(500).send('Errore nel caricamento della pagina di reset');
         } else {
-            const page = data.replace('<%= token %>', token);
-            console.log(`Sending page with token: ${token}`);  // Logging del token
+            const page = data.replace('<%= token %>', token).replace('<%= lang %>', lang);
+            console.log(`Sending page with token: ${token} and lang: ${lang}`);  // Logging del token e della lingua
             res.send(page);
         }
     });

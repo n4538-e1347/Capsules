@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset della Password</title>
+    <title>Reset Password</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -55,14 +55,59 @@
     </style>
 </head>
 <body>
-    <h1>Reset della Password</h1>
+    <h1 id="pageTitle">Reset Password</h1>
     <form id="resetForm">
         <input type="hidden" name="token" value="<%= token %>" />
-        <label for="newPassword">Nuova Password:</label>
+        <label for="newPassword" id="newPasswordLabel">New Password:</label>
         <input type="password" name="newPassword" id="newPassword" required />
-        <button type="submit">Reset Password</button>
+        <button type="submit" id="submitButton">Reset Password</button>
     </form>
     <script>
+        const translations = {
+            en: {
+                pageTitle: 'Reset Password',
+                newPasswordLabel: 'New Password:',
+                submitButton: 'Reset Password',
+                successMessage: 'Password reset successfully. You can close this page.',
+                errorMessage: 'Error:'
+            },
+            it: {
+                pageTitle: 'Reset della Password',
+                newPasswordLabel: 'Nuova Password:',
+                submitButton: 'Reset Password',
+                successMessage: 'Password resettata con successo. Puoi chiudere questa pagina.',
+                errorMessage: 'Errore:'
+            },
+            es: {
+                pageTitle: 'Restablecer la Contraseña',
+                newPasswordLabel: 'Nueva Contraseña:',
+                submitButton: 'Restablecer la Contraseña',
+                successMessage: 'Contraseña restablecida con éxito. Puedes cerrar esta página.',
+                errorMessage: 'Error:'
+            },
+            fr: {
+                pageTitle: 'Réinitialiser le Mot de Passe',
+                newPasswordLabel: 'Nouveau Mot de Passe:',
+                submitButton: 'Réinitialiser le Mot de Passe',
+                successMessage: 'Mot de passe réinitialisé avec succès. Vous pouvez fermer cette page.',
+                errorMessage: 'Erreur:'
+            },
+            de: {
+                pageTitle: 'Passwort zurücksetzen',
+                newPasswordLabel: 'Neues Passwort:',
+                submitButton: 'Passwort zurücksetzen',
+                successMessage: 'Passwort erfolgreich zurückgesetzt. Sie können diese Seite schließen.',
+                errorMessage: 'Fehler:'
+            }
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const lang = params.get('lang') || 'en'; // Lingua di default
+
+        document.getElementById('pageTitle').textContent = translations[lang].pageTitle;
+        document.getElementById('newPasswordLabel').textContent = translations[lang].newPasswordLabel;
+        document.getElementById('submitButton').textContent = translations[lang].submitButton;
+
         const form = document.getElementById('resetForm');
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -78,11 +123,11 @@
             });
 
             if (response.ok) {
-                alert('Password resettata con successo. Puoi chiudere questa pagina.');
+                alert(translations[lang].successMessage);
                 window.close();  // Chiude la pagina web
             } else {
                 const errorText = await response.text();
-                alert(`Errore: ${errorText}`);
+                alert(`${translations[lang].errorMessage} ${errorText}`);
             }
         });
 

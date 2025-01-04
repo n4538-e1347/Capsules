@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
 
 export default function ResetPasswordScreen({ navigation }) {
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
   const [token, setToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const scaleValue = useState(new Animated.Value(1))[0];
@@ -15,13 +17,13 @@ export default function ResetPasswordScreen({ navigation }) {
       
       const response = await axios.post('http://192.168.1.14:3000/resetPassword', { token: trimmedToken, newPassword: trimmedPassword });
       if (response.status === 200) {
-        alert('Password resettata con successo');
+        alert(t('passwordResetSuccess'));
         navigation.navigate('Login');  // Utilizza la navigazione di React Native per andare alla schermata di login
       } else {
-        alert('Errore nel reset della password. Per favore, riprova.');
+        alert(t('passwordResetError'));
       }
     } catch (error) {
-      alert(`Errore di connessione: ${error.message}`);
+      alert(`${t('connectionError')}: ${error.message}`);
     }
   };
 
@@ -35,16 +37,16 @@ export default function ResetPasswordScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Reset della Password</Text>
+        <Text style={styles.title}>{t('resetPasswordTitle')}</Text>
         <TextInput 
           style={styles.input} 
-          placeholder="Token" 
+          placeholder={t('tokenPlaceholder')} 
           value={token} 
           onChangeText={setToken} 
         />
         <TextInput 
           style={styles.input} 
-          placeholder="Nuova Password" 
+          placeholder={t('newPasswordPlaceholder')} 
           value={newPassword} 
           onChangeText={setNewPassword} 
           secureTextEntry 
@@ -54,7 +56,7 @@ export default function ResetPasswordScreen({ navigation }) {
             style={styles.resetButton}
             onPress={() => { animateButton(); handleResetPassword(); }}
           >
-            <Text style={styles.buttonText}>Reset Password</Text>
+            <Text style={styles.buttonText}>{t('resetPasswordButton')}</Text>
           </TouchableOpacity>
         </Animated.View>
         <View style={styles.bottomContainer}>

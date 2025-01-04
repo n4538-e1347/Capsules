@@ -3,31 +3,36 @@ import { SafeAreaView, View, Text, TextInput, TouchableOpacity, StyleSheet, Anim
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Importa l'icona
+import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
+import i18n from 'i18next';
 
 export default function LoginScreen({ navigation }) {
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useContext(AuthContext);
   const scaleValue = useState(new Animated.Value(1))[0];
 
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post('http://192.168.1.14:3000/login', { username, password });
-      if (response.status === 200) {
-        const userData = { username }; // Salva l'username dell'utente
-        login(userData); // Passa i dati dell'utente alla funzione di login del contesto
-        navigation.navigate('Home');
-      } else {
-        alert('Login fallito. Per favore, controlla le tue credenziali.');
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 400) {
-        alert('Username o password non corretti');
-      } else {
-        alert(`Errore di connessione: ${error.message}`);
-      }
+const handleLogin = async () => {
+  try {
+    const response = await axios.post('http://192.168.1.14:3000/login', { username, password });
+    if (response.status === 200) {
+      const userData = response.data; // Assumiamo che la risposta contenga i dati utente inclusa la lingua
+      console.log('Dati utente ricevuti al login:', userData); // Debug
+      login(userData); // Passa i dati dell'utente alla funzione di login del contesto
+      i18n.changeLanguage(userData.language); // Cambia la lingua nell'app
+      navigation.navigate('Home');
+    } else {
+      alert(t('loginFailed'));
     }
-  };
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      alert(t('incorrectUsernamePassword'));
+    } else {
+      alert(`${t('connectionError')}: ${error.message}`);
+    }
+  }
+};
 
   const animateButton = () => {
     Animated.sequence([
@@ -39,16 +44,16 @@ export default function LoginScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
+        <Text style={styles.title}>{t('login')}</Text>
         <TextInput 
           style={styles.input} 
-          placeholder="Username" 
+          placeholder={t('usernamePlaceholder')} 
           value={username} 
           onChangeText={setUsername} 
         />
         <TextInput 
           style={styles.input} 
-          placeholder="Password" 
+          placeholder={t('passwordPlaceholder')} 
           value={password} 
           onChangeText={setPassword} 
           secureTextEntry 
@@ -58,28 +63,31 @@ export default function LoginScreen({ navigation }) {
             style={styles.button}
             onPress={() => { animateButton(); handleLogin(); }}
           >
-            <Text style={styles.buttonText}>Login</Text>
+            <Text style={styles.buttonText}>{t('login')}</Text>
           </TouchableOpacity>
         </Animated.View>
         <TouchableOpacity onPress={() => navigation.navigate('RequestPasswordReset')}>
-          <Text style={styles.link}>Password dimenticata?</Text>
+          <Text style={styles.link}>{t('forgotPassword')}</Text>
         </TouchableOpacity>
-        <View style={styles.bottomContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => { animateButton(); navigation.goBack(); }}
-            >
-              <Text>
-                <Icon name="arrow-left" size={24} color="#FFF" />  {/* Icona back */}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
+		 <View style={styles.bottomContainer}>
+			<TouchableOpacity
+			 style={styles.backButton}
+			 onPress={() => navigation.goBack()}
+			>
+				<Text style={styles.iconWrapper}>
+					<Text>
+					  <Icon name="arrow-left" size={24} color="#FFF" />
+					</Text>
+				</Text>
+			</TouchableOpacity>
+		 </View>
       </View>
     </SafeAreaView>
   );
 }
+
+
+
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -115,7 +123,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
-    width: 150, // Larghezza fissa per i pulsanti
+    width: 190, // Larghezza fissa per i pulsanti
   },
   buttonText: {
     color: '#FFF',

@@ -1,15 +1,47 @@
-import React, { useState } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import { AuthContext } from '../contexts/AuthContext'; // Importa il contesto AuthContext
 
 export default function SettingsScreen({ navigation }) {
   const { t, i18n } = useTranslation();
+  const { user } = useContext(AuthContext); // Ottieni user dal contesto Auth
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
 
-  const changeLanguage = (language) => {
-    i18n.changeLanguage(language);
-    setSelectedLanguage(language);
+  useEffect(() => {
+    // Controllo utente al montaggio del componente
+    if (!user || !user.username) {
+      Alert.alert(
+        t('error'),
+        t('userNotAuthenticated'),
+        [{ text: t('ok'), onPress: () => navigation.goBack() }]
+      );
+    }
+  }, [user, navigation, t]);
+
+  // Funzione per cambiare lingua
+  const changeLanguage = async (language) => {
+    if (!user || !user.username) {
+      console.error('Errore: utente non autenticato');
+      Alert.alert(t('error'), t('userNotAuthenticated'));
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://192.168.1.14:3000/updateLanguage', {
+        username: user.username,
+        language,
+      });
+
+      console.log('Risposta del server:', response.data); // Debug
+      i18n.changeLanguage(language);
+      setSelectedLanguage(language);
+    } catch (error) {
+      console.error('Errore nell\'aggiornamento della lingua', error?.response?.data || error.message);
+      Alert.alert(t('error'), t('languageUpdateFailed'));
+    }
   };
 
   return (

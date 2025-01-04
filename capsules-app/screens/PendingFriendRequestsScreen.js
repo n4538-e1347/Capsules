@@ -3,8 +3,10 @@ import { SafeAreaView, View, Text, FlatList, StyleSheet, Modal, TouchableOpacity
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
 
 export default function PendingFriendRequestsScreen({ navigation }) {
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
   const { user } = useContext(AuthContext);
   const [friendRequests, setFriendRequests] = useState([]);
   const [sentRequests, setSentRequests] = useState([]);
@@ -26,7 +28,7 @@ export default function PendingFriendRequestsScreen({ navigation }) {
         console.log("Received Friend Requests:", receivedResponse.data);
         console.log("Sent Friend Requests:", sentResponse.data);
       } catch (error) {
-        alert(`Errore di connessione: ${error.message}`);
+        alert(`${t('connectionError')}: ${error.message}`);
       }
     };
 
@@ -47,15 +49,15 @@ export default function PendingFriendRequestsScreen({ navigation }) {
     try {
       const response = await axios.post('http://192.168.1.14:3000/confirmFriendRequest', { username: user.username, friendUsername });
       if (response.status === 200) {
-        setSelectedMessage('Richiesta di amicizia confermata');
+        setSelectedMessage(t('friendRequestConfirmed'));
         setModalVisible(true);
         setFriendRequests(friendRequests.filter(request => request.userId.username !== friendUsername));
         setSentRequests(sentRequests.filter(request => request.username !== friendUsername));
       } else {
-        alert('Errore nella conferma della richiesta di amicizia');
+        alert(t('friendRequestConfirmError'));
       }
     } catch (error) {
-      alert(`Errore di connessione: ${error.message}`);
+      alert(`${t('connectionError')}: ${error.message}`);
     }
   };
 
@@ -64,15 +66,15 @@ export default function PendingFriendRequestsScreen({ navigation }) {
       const url = block ? 'http://192.168.1.14:3000/rejectAndBlockFriendRequest' : 'http://192.168.1.14:3000/rejectFriendRequest';
       const response = await axios.post(url, { username: user.username, friendUsername });
       if (response.status === 200) {
-        setSelectedMessage(block ? 'Richiesta di amicizia rifiutata e utente bloccato' : 'Richiesta di amicizia rifiutata');
+        setSelectedMessage(block ? t('friendRequestRejectedBlocked') : t('friendRequestRejected'));
         setModalVisible(true);
         setFriendRequests(friendRequests.filter(request => request.userId.username !== friendUsername));
         setSentRequests(sentRequests.filter(request => request.username !== friendUsername));
       } else {
-        alert(block ? 'Errore nel rifiuto e blocco della richiesta di amicizia' : 'Errore nel rifiuto della richiesta di amicizia');
+        alert(block ? t('friendRequestRejectBlockError') : t('friendRequestRejectError'));
       }
     } catch (error) {
-      alert(`Errore di connessione: ${error.message}`);
+      alert(`${t('connectionError')}: ${error.message}`);
     }
   };
 
@@ -80,14 +82,14 @@ export default function PendingFriendRequestsScreen({ navigation }) {
     try {
       const response = await axios.post('http://192.168.1.14:3000/withdrawFriendRequest', { username: user.username, friendUsername });
       if (response.status === 200) {
-        setSelectedMessage('Richiesta di amicizia ritirata');
+        setSelectedMessage(t('friendRequestWithdrawn'));
         setModalVisible(true);
         setSentRequests(sentRequests.filter(request => request.username !== friendUsername));
       } else {
-        alert('Errore nel ritiro della richiesta di amicizia');
+        alert(t('friendRequestWithdrawError'));
       }
     } catch (error) {
-      alert(`Errore di connessione: ${error.message}`);
+      alert(`${t('connectionError')}: ${error.message}`);
     }
   };
 
@@ -145,13 +147,13 @@ export default function PendingFriendRequestsScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Richieste di Amicizia Inviate</Text>
+        <Text style={styles.title}>{t('sentFriendRequests')}</Text>
         <FlatList 
           data={sentRequests}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => renderRequestItem(item, 'sent')}
         />
-        <Text style={styles.title}>Richieste di Amicizia Ricevute</Text>
+        <Text style={styles.title}>{t('receivedFriendRequests')}</Text>
         <FlatList 
           data={friendRequests}
           keyExtractor={(item) => item.userId._id}
@@ -188,18 +190,18 @@ export default function PendingFriendRequestsScreen({ navigation }) {
             </View>
           </View>
         </Modal>
-        <View style={styles.bottomContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => { animateButton(); navigation.goBack(); }}
-            >
-              <Text>
-                <Icon name="arrow-left" size={24} color="#FFF" />  {/* Icona back */}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
+		 <View style={styles.bottomContainer}>
+			<TouchableOpacity
+			 style={styles.backButton}
+			 onPress={() => navigation.goBack()}
+			>
+				<Text style={styles.iconWrapper}>
+					<Text>
+					  <Icon name="arrow-left" size={24} color="#FFF" />
+					</Text>
+				</Text>
+			</TouchableOpacity>
+		 </View>
       </View>
     </SafeAreaView>
   );

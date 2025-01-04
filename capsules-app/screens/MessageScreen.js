@@ -4,8 +4,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import DropDownPicker from 'react-native-dropdown-picker'; // Importa DropDownPicker
 import { AuthContext } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
 
 export default function MessageScreen({ navigation }) {
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
   const [newMessage, setNewMessage] = useState('');
   const [friends, setFriends] = useState([]);
   const [selectedFriend, setSelectedFriend] = useState(null);
@@ -24,7 +26,7 @@ export default function MessageScreen({ navigation }) {
       const response = await axios.get(`http://192.168.1.14:3000/contacts/${user.username}`);
       setFriends(response.data.map(friend => ({ label: friend.username, value: friend.username }))); // Formatta i dati per DropDownPicker
     } catch (error) {
-      alert(`Errore nel recupero degli amici: ${error.message}`);
+      alert(`${t('fetchFriendsError')}: ${error.message}`);
     }
   };
 
@@ -38,10 +40,10 @@ export default function MessageScreen({ navigation }) {
       if (response.status === 201) {
         setNewMessage(''); // Pulisci il campo del messaggio dopo l'invio
       } else {
-        alert('Errore nell\'invio del messaggio. Per favore, riprova.');
+        alert(t('sendMessageError'));
       }
     } catch (error) {
-      alert(`Errore nell'invio del messaggio: ${error.message}`);
+      alert(`${t('sendMessageError')}: ${error.message}`);
     }
   };
 
@@ -55,7 +57,7 @@ export default function MessageScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Messaggi</Text>
+        <Text style={styles.title}>{t('messages')}</Text>
         <DropDownPicker
           open={open}
           value={selectedFriend}
@@ -63,7 +65,7 @@ export default function MessageScreen({ navigation }) {
           setOpen={setOpen}
           setValue={setSelectedFriend}
           setItems={setFriends}
-          placeholder="Seleziona un amico"
+          placeholder={t('selectFriend')}
           style={styles.dropdown}
           dropDownContainerStyle={styles.dropdownContainer}
           labelStyle={styles.dropdownLabel}
@@ -71,7 +73,7 @@ export default function MessageScreen({ navigation }) {
         <View style={styles.inputContainer}>
           <TextInput
             style={[styles.input, { marginTop: 20 }]} // Sposta l'input messaggio più in basso
-            placeholder="Scrivi un messaggio"
+            placeholder={t('writeMessage')}
             value={newMessage}
             onChangeText={setNewMessage}
             maxLength={150} // Imposta il limite di caratteri a 150
@@ -79,22 +81,22 @@ export default function MessageScreen({ navigation }) {
           />
         </View>
         <View style={styles.bottomContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => { animateButton(); navigation.goBack(); }}
-            >
-              <Text>
-                <Icon name="arrow-left" size={24} color="#FFF" />  {/* Icona back */}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
+			<TouchableOpacity
+			 style={styles.backButton}
+			 onPress={() => navigation.goBack()}
+			>
+				<Text style={styles.iconWrapper}>
+					<Text>
+					  <Icon name="arrow-left" size={24} color="#FFF" />
+					</Text>
+				</Text>
+			</TouchableOpacity>
           <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
             <TouchableOpacity
               style={styles.sendButton}
               onPress={() => { animateButton(); sendMessage(); }}
             >
-              <Text style={styles.buttonText}>Invia</Text>
+              <Text style={styles.buttonText}>{t('send')}</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>

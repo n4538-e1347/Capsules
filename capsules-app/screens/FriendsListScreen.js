@@ -3,8 +3,10 @@ import { SafeAreaView, View, Text, FlatList, StyleSheet, Modal, TouchableOpacity
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
 
 export default function FriendsListScreen({ navigation }) {
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
   const { user } = useContext(AuthContext);
   const [friends, setFriends] = useState([]);
   const [blockedUsers, setBlockedUsers] = useState([]);
@@ -20,7 +22,7 @@ export default function FriendsListScreen({ navigation }) {
         const blockedUsersResponse = await axios.get(`http://192.168.1.14:3000/blockedUsers/${user.username}`);
         setBlockedUsers(blockedUsersResponse.data);
       } catch (error) {
-        alert(`Errore di connessione: ${error.message}`);
+        alert(`${t('connectionError')}: ${error.message}`);
       }
     };
     fetchFriendsAndBlockedUsers();
@@ -43,7 +45,7 @@ export default function FriendsListScreen({ navigation }) {
       }
       const response = await axios.post('http://192.168.1.14:3000/removeFriend', { username: user.username, friendUsername });
       if (response.status === 200) {
-        setConfirmationMessage(block ? 'Amico rimosso e bloccato con successo' : 'Amico rimosso con successo');
+        setConfirmationMessage(block ? t('friendRemovedBlockedSuccess') : t('friendRemovedSuccess'));
         setShowConfirmation(true);
         setFriends(friends.filter(friend => friend.username !== friendUsername));
         if (block) {
@@ -51,11 +53,11 @@ export default function FriendsListScreen({ navigation }) {
           setBlockedUsers([...blockedUsers, { username: friendUsername, _id: new Date().getTime().toString() }]);
         }
       } else {
-        setConfirmationMessage('Errore nella rimozione dell\'amico');
+        setConfirmationMessage(t('friendRemoveError'));
         setShowConfirmation(true);
       }
     } catch (error) {
-      setConfirmationMessage(`Errore di connessione: ${error.message}`);
+      setConfirmationMessage(`${t('connectionError')}: ${error.message}`);
       setShowConfirmation(true);
     }
   };
@@ -64,15 +66,15 @@ export default function FriendsListScreen({ navigation }) {
     try {
       const response = await axios.post('http://192.168.1.14:3000/unblockUser', { username: user.username, unblockUsername: blockUsername });
       if (response.status === 200) {
-        setConfirmationMessage('Utente sbloccato con successo');
+        setConfirmationMessage(t('userUnblockedSuccess'));
         setShowConfirmation(true);
         setBlockedUsers(blockedUsers.filter(user => user.username !== blockUsername));
       } else {
-        setConfirmationMessage('Errore nello sblocco dell\'utente');
+        setConfirmationMessage(t('userUnblockError'));
         setShowConfirmation(true);
       }
     } catch (error) {
-      setConfirmationMessage(`Errore di connessione: ${error.message}`);
+      setConfirmationMessage(`${t('connectionError')}: ${error.message}`);
       setShowConfirmation(true);
     }
   };
@@ -95,7 +97,7 @@ export default function FriendsListScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Elenco degli Amici</Text>
+        <Text style={styles.title}>{t('friendsListTitle')}</Text>
         <FlatList
           data={friends}
           keyExtractor={(item) => item._id}
@@ -121,7 +123,7 @@ export default function FriendsListScreen({ navigation }) {
             </View>
           )}
         />
-        <Text style={styles.title}>Utenti Bloccati</Text>
+        <Text style={styles.title}>{t('blockedUsersTitle')}</Text>
         <FlatList
           data={blockedUsers}
           keyExtractor={(item) => item._id}
@@ -151,18 +153,18 @@ export default function FriendsListScreen({ navigation }) {
             </View>
           </View>
         </Modal>
-        <View style={styles.bottomContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => { animateButton(); navigation.goBack(); }}
-            >
-              <Text>
-                <Icon name="arrow-left" size={24} color="#FFF" /> {/* Icona back */}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
+		 <View style={styles.bottomContainer}>
+			<TouchableOpacity
+			 style={styles.backButton}
+			 onPress={() => navigation.goBack()}
+			>
+				<Text style={styles.iconWrapper}>
+					<Text>
+					  <Icon name="arrow-left" size={24} color="#FFF" />
+					</Text>
+				</Text>
+			</TouchableOpacity>
+		 </View>
       </View>
     </SafeAreaView>
   );

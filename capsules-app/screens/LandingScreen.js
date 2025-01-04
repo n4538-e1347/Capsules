@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
 
 export default function LandingScreen({ navigation }) {
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
   const scaleValue = useState(new Animated.Value(1))[0];
 
   const animateButton = () => {
@@ -14,14 +16,14 @@ export default function LandingScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Welcome to Capsules!</Text>
+        <Text style={styles.title}>{t('welcome')}</Text>
         <View style={styles.bottomContainer}>
           <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
             <TouchableOpacity
               style={[styles.button, styles.leftButton]}
               onPress={() => { animateButton(); navigation.navigate('Login'); }}
             >
-              <Text style={styles.buttonText}>Login</Text>
+              <Text style={styles.buttonText}>{t('login')}</Text>
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
@@ -29,7 +31,7 @@ export default function LandingScreen({ navigation }) {
               style={[styles.button, styles.rightButton]}
               onPress={() => { animateButton(); navigation.navigate('Register'); }}
             >
-              <Text style={styles.buttonText}>Register</Text>
+              <Text style={styles.buttonText}>{t('register')}</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>

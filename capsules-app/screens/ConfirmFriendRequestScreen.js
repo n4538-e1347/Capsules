@@ -33,18 +33,18 @@ export default function ConfirmFriendRequestScreen({ route, navigation }) {
       <View style={styles.container}>
         <Text style={styles.title}>Confermare Amicizia con {friendUsername}</Text>
         <Button title="Conferma" onPress={handleConfirmRequest} />
-        <View style={styles.bottomContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => { animateButton(); navigation.goBack(); }}
-            >
-              <Text>
-                <Icon name="arrow-left" size={24} color="#FFF" />  {/* Icona back */}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
+		 <View style={styles.bottomContainer}>
+			<TouchableOpacity
+			 style={styles.backButton}
+			 onPress={() => navigation.goBack()}
+			>
+				<Text style={styles.iconWrapper}>
+					<Text>
+					  <Icon name="arrow-left" size={24} color="#FFF" />
+					</Text>
+				</Text>
+			</TouchableOpacity>
+		 </View>
       </View>
     </SafeAreaView>
   );

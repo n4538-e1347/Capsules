@@ -3,35 +3,37 @@ import { SafeAreaView, View, Text, TouchableOpacity, Alert, StyleSheet, Animated
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Importa l'icona
+import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
 
 export default function ProfileScreen({ navigation }) {
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
   const { user, logout } = useContext(AuthContext);
   const scaleValue = useState(new Animated.Value(1))[0];
 
   const handleDeleteAccount = async () => {
     Alert.alert(
-      "Conferma Eliminazione Account",
-      "Sei sicuro di voler eliminare il tuo account? Tutti i tuoi dati verranno cancellati, inclusi i messaggi scambiati, e non potranno essere recuperati.",
+      t('deleteAccountConfirmation'),
+      t('deleteAccountPrompt'),
       [
         {
-          text: "Annulla",
-          style: "cancel"
+          text: t('cancel'),
+          style: 'cancel'
         },
         {
-          text: "Elimina",
-          style: "destructive",
+          text: t('delete'),
+          style: 'destructive',
           onPress: async () => {
             try {
               const response = await axios.post('http://192.168.1.14:3000/deleteAccount', { username: user.username });
               if (response.status === 200) {
-                alert('Account eliminato con successo');
+                alert(t('accountDeleted'));
                 logout(); // Esegui il logout dell'utente dopo l'eliminazione dell'account
                 navigation.navigate('Landing'); // Torna alla schermata di benvenuto
               } else {
-                alert('Errore nell\'eliminazione dell\'account');
+                alert(t('deleteAccountError'));
               }
             } catch (error) {
-              alert(`Errore di connessione: ${error.message}`);
+              alert(`${t('connectionError')}: ${error.message}`);
             }
           }
         }
@@ -49,13 +51,13 @@ export default function ProfileScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Profilo</Text>
+        <Text style={styles.title}>{t('profile')}</Text>
         <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
           <TouchableOpacity
             style={styles.button}
             onPress={() => { animateButton(); navigation.navigate('SendFriendRequest'); }}
           >
-            <Text style={styles.buttonText}>Richiedi Amicizia</Text>
+            <Text style={styles.buttonText}>{t('sendFriendRequest')}</Text>
           </TouchableOpacity>
         </Animated.View>
         <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
@@ -63,7 +65,7 @@ export default function ProfileScreen({ navigation }) {
             style={styles.button}
             onPress={() => { animateButton(); navigation.navigate('PendingFriendRequests'); }}
           >
-            <Text style={styles.buttonText}>Richieste in sospeso</Text>
+            <Text style={styles.buttonText}>{t('pendingFriendRequests')}</Text>
           </TouchableOpacity>
         </Animated.View>
         <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
@@ -71,7 +73,7 @@ export default function ProfileScreen({ navigation }) {
             style={styles.button}
             onPress={() => { animateButton(); navigation.navigate('FriendsList'); }}
           >
-            <Text style={styles.buttonText}>Elenco degli Amici</Text>
+            <Text style={styles.buttonText}>{t('friendsList')}</Text>
           </TouchableOpacity>
         </Animated.View>
         <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
@@ -79,21 +81,21 @@ export default function ProfileScreen({ navigation }) {
             style={[styles.button, { backgroundColor: 'red' }]}
             onPress={() => { animateButton(); handleDeleteAccount(); }}
           >
-            <Text style={styles.buttonText}>Elimina Account</Text>
+            <Text style={styles.buttonText}>{t('deleteAccount')}</Text>
           </TouchableOpacity>
         </Animated.View>
-        <View style={styles.bottomContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => { animateButton(); navigation.goBack(); }}
-            >
-              <Text>
-                <Icon name="arrow-left" size={24} color="#FFF" />  {/* Icona back */}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
+		 <View style={styles.bottomContainer}>
+			<TouchableOpacity
+			 style={styles.backButton}
+			 onPress={() => navigation.goBack()}
+			>
+				<Text style={styles.iconWrapper}>
+					<Text>
+					  <Icon name="arrow-left" size={24} color="#FFF" />
+					</Text>
+				</Text>
+			</TouchableOpacity>
+		 </View>
       </View>
     </SafeAreaView>
   );

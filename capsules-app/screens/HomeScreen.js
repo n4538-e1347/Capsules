@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'; // Importa il hook useTranslatio
 
 export default function HomeScreen({ navigation }) {
   const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
-  const { isAuthenticated, logout, user } = useContext(AuthContext);
+  const { user, isAuthenticated, logout } = useContext(AuthContext);
   const scaleValue = useState(new Animated.Value(1))[0];
   const [messages, setMessages] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -62,92 +62,113 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={[styles.roundButton, styles.topLeftButton]}
-          onPress={() => { animateButton(); navigation.navigate('ArchivedMessagesScreen'); }}
-        >
-          <View style={styles.iconWrapper}>
-            <Icon name="envelope-open" size={24} color="#FFF" style={styles.icon} />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.roundButton, styles.topRightButton]}
-          onPress={() => { animateButton(); navigation.navigate('SettingsScreen'); }}
-        >
-          <View style={styles.iconWrapper}>
-            <Icon name="cog" size={24} color="#FFF" style={styles.icon} />
-          </View>
-        </TouchableOpacity>
-        <Text style={[styles.title, { marginTop: 60 }]}>{t('welcome')}</Text>
-        <TouchableOpacity style={styles.largeButton} onPress={showRandomMessage}>
-          <Text style={styles.buttonText}>{t('showMessage')}</Text>
-        </TouchableOpacity>
-        <Modal isVisible={isModalVisible}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>{randomMessage}</Text>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={styles.closeButton}>{t('close')}</Text>
+return (
+  <SafeAreaView style={styles.safeArea}>
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={[styles.roundButton, styles.topLeftButton]}
+        onPress={() => {
+          animateButton();
+          navigation.navigate('ArchivedMessagesScreen');
+        }}
+      >
+        <View style={styles.iconWrapper}>
+          <Icon name="envelope-open" size={24} color="#FFF" style={styles.icon} />
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.roundButton, styles.topRightButton]}
+        onPress={() => {
+          animateButton();
+          navigation.navigate('SettingsScreen');
+        }}
+      >
+        <View style={styles.iconWrapper}>
+          <Icon name="cog" size={24} color="#FFF" style={styles.icon} />
+        </View>
+      </TouchableOpacity>
+      <Text style={[styles.title, { marginTop: 60 }]}>{t('welcome')}</Text>
+      <TouchableOpacity style={styles.largeButton} onPress={showRandomMessage}>
+        <Text style={styles.buttonText}>{t('showMessage')}</Text>
+      </TouchableOpacity>
+      <Modal isVisible={isModalVisible}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>{randomMessage}</Text>
+          <TouchableOpacity onPress={() => setModalVisible(false)}>
+            <Text style={styles.closeButton}>{t('close')}</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+      {isAuthenticated ? (
+        <View style={styles.buttonContainer}>
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <TouchableOpacity
+              style={[styles.roundButton, styles.bottomButton]}
+              onPress={() => {
+                animateButton();
+                navigation.navigate('Profile');
+              }}
+            >
+              <View style={styles.iconWrapper}>
+                <Icon name="user" size={24} color="#FFF" />
+              </View>
             </TouchableOpacity>
-          </View>
-        </Modal>
-        {isAuthenticated ? (
-          <View style={styles.buttonContainer}>
-            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-              <TouchableOpacity
-                style={[styles.roundButton, styles.bottomButton]}
-                onPress={() => { animateButton(); navigation.navigate('Profile'); }}
-              >
-                <View style={styles.iconWrapper}>
-                  <Icon name="user" size={24} color="#FFF" />
-                </View>
-              </TouchableOpacity>
-            </Animated.View>
-            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-              <TouchableOpacity
-                style={styles.rectangleButton}
-                onPress={() => { animateButton(); navigation.navigate('Messages'); }}
-              >
-                <Text style={styles.buttonText}>{t('sendMessage')}</Text>
-              </TouchableOpacity>
-            </Animated.View>
-            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-              <TouchableOpacity
-                style={[styles.roundButton, styles.bottomButton]}
-                onPress={() => { animateButton(); handleLogout(); }}
-              >
-                <View style={styles.iconWrapper}>
-                  <Icon name="sign-out" size={24} color="#FFF" />
-                </View>
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
-        ) : (
-          <View style={styles.buttonContainer}>
-            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-              <TouchableOpacity
-                style={styles.rectangleButton}
-                onPress={() => { animateButton(); navigation.navigate('Login'); }}
-              >
-                <Text style={styles.buttonText}>{t('login')}</Text>
-              </TouchableOpacity>
-            </Animated.View>
-            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-              <TouchableOpacity
-                style={styles.rectangleButton}
-                onPress={() => { animateButton(); navigation.navigate('Register'); }}
-              >
-                <Text style={styles.buttonText}>{t('register')}</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
-        )}
-      </View>
-    </SafeAreaView>
-  );
-}
+          </Animated.View>
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <TouchableOpacity
+              style={styles.rectangleButton}
+              onPress={() => {
+                animateButton();
+                navigation.navigate('Messages');
+              }}
+            >
+              <Text style={styles.buttonText}>{t('sendMessage')}</Text>
+            </TouchableOpacity>
+          </Animated.View>
+			 <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+			  <TouchableOpacity
+				style={[styles.roundButton, styles.bottomButton]}
+				onPress={() => {
+				  animateButton();
+				  handleLogout();
+				}}
+			  >
+				<View style={styles.iconWrapper}>
+				  <Icon name="sign-out" size={24} color="#FFF" />
+				</View>
+			  </TouchableOpacity>
+			</Animated.View>
+        </View>
+      ) : (
+        <View style={styles.buttonContainer}>
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <TouchableOpacity
+              style={styles.rectangleButton}
+              onPress={() => {
+                animateButton();
+                navigation.navigate('Login');
+              }}
+            >
+              <Text style={styles.buttonText}>{t('login')}</Text>
+            </TouchableOpacity>
+          </Animated.View>
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <TouchableOpacity
+              style={styles.rectangleButton}
+              onPress={() => {
+                animateButton();
+                navigation.navigate('Register');
+              }}
+            >
+              <Text style={styles.buttonText}>{t('register')}</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      )}
+    </View>
+  </SafeAreaView>
+);
+} 
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -244,5 +265,11 @@ const styles = StyleSheet.create({
     color: '#32CD32',
     fontWeight: 'bold',
     marginTop: 10,
+  },
+  iconWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
   },
 });

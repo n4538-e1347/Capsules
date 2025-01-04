@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { SafeAreaView, View, Text, TextInput, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Importa l'icona
+import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
 
 export default function RegisterScreen({ navigation }) {
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -15,13 +17,13 @@ export default function RegisterScreen({ navigation }) {
       if (response.status === 201) {
         navigation.navigate('Login');
       } else {
-        alert('Registrazione fallita. Per favore, riprova.');
+        alert(t('registerFailed'));
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
         alert(error.response.data);  // Mostra il messaggio di errore specifico
       } else {
-        alert(`Errore di connessione: ${error.message}`);
+        alert(`${t('connectionError')}: ${error.message}`);
       }
     }
   };
@@ -36,23 +38,23 @@ export default function RegisterScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Registrazione</Text>
+        <Text style={styles.title}>{t('register')}</Text>
         <TextInput 
           style={styles.input} 
-          placeholder="Username" 
+          placeholder={t('usernamePlaceholder')} 
           value={username} 
           onChangeText={setUsername} 
         />
         <TextInput 
           style={styles.input} 
-          placeholder="Password" 
+          placeholder={t('passwordPlaceholder')} 
           value={password} 
           onChangeText={setPassword} 
           secureTextEntry 
         />
         <TextInput 
           style={styles.input} 
-          placeholder="Email" 
+          placeholder={t('emailPlaceholder')} 
           value={email} 
           onChangeText={setEmail} 
         />
@@ -61,21 +63,21 @@ export default function RegisterScreen({ navigation }) {
             style={styles.button}
             onPress={() => { animateButton(); handleRegister(); }}
           >
-            <Text style={styles.buttonText}>Registrati</Text>
+            <Text style={styles.buttonText}>{t('register')}</Text>
           </TouchableOpacity>
         </Animated.View>
-        <View style={styles.bottomContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => { animateButton(); navigation.goBack(); }}
-            >
-              <Text>
-                <Icon name="arrow-left" size={24} color="#FFF" />  {/* Icona back */}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
+		 <View style={styles.bottomContainer}>
+			<TouchableOpacity
+			 style={styles.backButton}
+			 onPress={() => navigation.goBack()}
+			>
+				<Text style={styles.iconWrapper}>
+					<Text>
+					  <Icon name="arrow-left" size={24} color="#FFF" />
+					</Text>
+				</Text>
+			</TouchableOpacity>
+		 </View>
       </View>
     </SafeAreaView>
   );
@@ -115,7 +117,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
-    width: 150, // Larghezza fissa per i pulsanti
+    width: 190, // Larghezza fissa per i pulsanti
   },
   buttonText: {
     color: '#FFF',

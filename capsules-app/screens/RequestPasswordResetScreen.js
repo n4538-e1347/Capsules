@@ -2,24 +2,27 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
+import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
 
 export default function RequestPasswordResetScreen({ navigation }) {
-  const [email, setEmail] = useState('');  // Cambia da username a email
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
+  const [email, setEmail] = useState('');
   const scaleValue = useState(new Animated.Value(1))[0];
 
   const handleRequestReset = async () => {
     try {
-      const trimmedEmail = email.trim();  // Trimmare gli spazi all'inizio e alla fine
+      const trimmedEmail = email.trim();
 
-      const response = await axios.post('http://192.168.1.14:3000/requestPasswordReset', { email: trimmedEmail });  // Usa l'email
+      const response = await axios.post('http://192.168.1.14:3000/requestPasswordReset', { email: trimmedEmail });
       if (response.status === 200) {
-        alert('Email di reset della password inviata con successo');
+        alert(t('resetEmailSentSuccess'));
         navigation.navigate('Login');
       } else {
-        alert('Errore nella richiesta di reset della password. Per favore, riprova.');
+        alert(t('resetEmailSendError'));
       }
     } catch (error) {
-      alert(`Errore di connessione: ${error.message}`);
+      alert(`${t('connectionError')}: ${error.message}`);
     }
   };
 
@@ -33,19 +36,19 @@ export default function RequestPasswordResetScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Reset della Password</Text>
+        <Text style={styles.title}>{t('resetPasswordTitle')}</Text>
         <TextInput 
           style={styles.input} 
-          placeholder="Email" 
+          placeholder={t('emailPlaceholder')} 
           value={email} 
-          onChangeText={setEmail}  // Cambia da setUsername a setEmail
+          onChangeText={setEmail} 
         />
         <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
           <TouchableOpacity
             style={styles.resetButton}
             onPress={() => { animateButton(); handleRequestReset(); }}
           >
-            <Text style={styles.buttonText}>Richiedi Reset</Text>
+            <Text style={styles.buttonText}>{t('requestResetButton')}</Text>
           </TouchableOpacity>
         </Animated.View>
         <View style={styles.bottomContainer}>
