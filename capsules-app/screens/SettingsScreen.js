@@ -1,34 +1,46 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Importa le icone
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsScreen({ navigation }) {
-  const [selectedLanguage, setSelectedLanguage] = useState('en'); // Default language is English
+  const { t, i18n } = useTranslation();
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
 
   const changeLanguage = (language) => {
+    i18n.changeLanguage(language);
     setSelectedLanguage(language);
-    // Logica per cambiare la lingua nell'app
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Impostazioni</Text>
+        <Text style={styles.title}>{t('settingsTitle')}</Text>
         <TouchableOpacity onPress={() => changeLanguage('en')} style={styles.languageButton}>
-          <Text style={selectedLanguage === 'en' ? styles.selectedText : styles.buttonText}>English</Text>
+          <Text style={selectedLanguage === 'en' ? styles.selectedText : styles.buttonText}>{t('english')}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => changeLanguage('it')} style={styles.languageButton}>
-          <Text style={selectedLanguage === 'it' ? styles.selectedText : styles.buttonText}>Italiano</Text>
+          <Text style={selectedLanguage === 'it' ? styles.selectedText : styles.buttonText}>{t('italian')}</Text>
         </TouchableOpacity>
-        {/* Aggiungi altre lingue se necessario */}
+        <TouchableOpacity onPress={() => changeLanguage('de')} style={styles.languageButton}>
+          <Text style={selectedLanguage === 'de' ? styles.selectedText : styles.buttonText}>{t('german')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => changeLanguage('es')} style={styles.languageButton}>
+          <Text style={selectedLanguage === 'es' ? styles.selectedText : styles.buttonText}>{t('spanish')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => changeLanguage('fr')} style={styles.languageButton}>
+          <Text style={selectedLanguage === 'fr' ? styles.selectedText : styles.buttonText}>{t('french')}</Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.bottomContainer}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.goBack()} // Torna alla Home
+          onPress={() => navigation.goBack()}
         >
-          <Text>
-            <Icon name="arrow-left" size={24} color="#FFF" /> {/* Icona back */}
+          <Text style={styles.iconWrapper}>
+            <Text>
+              <Icon name="arrow-left" size={24} color="#FFF" />
+            </Text>
           </Text>
         </TouchableOpacity>
       </View>
@@ -65,7 +77,7 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-start', // Allinea a sinistra
+    justifyContent: 'flex-start',
     alignItems: 'center',
     width: '100%',
     position: 'absolute',
@@ -73,8 +85,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   backButton: {
-    backgroundColor: '#32CD32', // Verde
-    borderRadius: 50, // Pulsante rotondo
+    backgroundColor: '#32CD32',
+    borderRadius: 50,
     width: 60,
     height: 60,
     justifyContent: 'center',
@@ -84,5 +96,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
+  },
+  iconWrapper: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    width: '100%',
+    height: '100%',
   },
 });

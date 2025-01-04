@@ -18,6 +18,7 @@ import RequestPasswordResetScreen from './screens/RequestPasswordResetScreen';
 import ResetPasswordScreen from './screens/ResetPasswordScreen';
 import ArchivedMessagesScreen from './screens/ArchivedMessagesScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import './i18n'; // Importa la configurazione di i18next
 
 const Stack = createStackNavigator();
 

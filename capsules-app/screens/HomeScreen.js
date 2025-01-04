@@ -4,8 +4,10 @@ import { AuthContext } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Importa le icone
 import axios from 'axios';
 import Modal from 'react-native-modal';
+import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
 
 export default function HomeScreen({ navigation }) {
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
   const { isAuthenticated, logout, user } = useContext(AuthContext);
   const scaleValue = useState(new Animated.Value(1))[0];
   const [messages, setMessages] = useState([]);
@@ -65,29 +67,29 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.container}>
         <TouchableOpacity
           style={[styles.roundButton, styles.topLeftButton]}
-          onPress={() => { animateButton(); navigation.navigate('ArchivedMessagesScreen'); }} // Naviga a ArchivedMessagesScreen
+          onPress={() => { animateButton(); navigation.navigate('ArchivedMessagesScreen'); }}
         >
-          <Text style={styles.iconWrapper}>
-            <Icon name="envelope-open" size={24} color="#FFF" style={styles.icon} /> {/* Icona busta bianca aperta */}
-          </Text>
+          <View style={styles.iconWrapper}>
+            <Icon name="envelope-open" size={24} color="#FFF" style={styles.icon} />
+          </View>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.roundButton, styles.topRightButton]}
-          onPress={() => { animateButton(); navigation.navigate('SettingsScreen'); }} // Naviga a SettingsScreen
+          onPress={() => { animateButton(); navigation.navigate('SettingsScreen'); }}
         >
-          <Text style={styles.iconWrapper}>
-            <Icon name="cog" size={24} color="#FFF" style={styles.icon} /> {/* Icona Settings */}
-          </Text>
+          <View style={styles.iconWrapper}>
+            <Icon name="cog" size={24} color="#FFF" style={styles.icon} />
+          </View>
         </TouchableOpacity>
-        <Text style={[styles.title, { marginTop: 60 }]}>Welcome to Capsules!</Text>
+        <Text style={[styles.title, { marginTop: 60 }]}>{t('welcome')}</Text>
         <TouchableOpacity style={styles.largeButton} onPress={showRandomMessage}>
-          <Text style={styles.buttonText}>Mostra Messaggio</Text>
+          <Text style={styles.buttonText}>{t('showMessage')}</Text>
         </TouchableOpacity>
         <Modal isVisible={isModalVisible}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>{randomMessage}</Text>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={styles.closeButton}>Chiudi</Text>
+              <Text style={styles.closeButton}>{t('close')}</Text>
             </TouchableOpacity>
           </View>
         </Modal>
@@ -98,9 +100,9 @@ export default function HomeScreen({ navigation }) {
                 style={[styles.roundButton, styles.bottomButton]}
                 onPress={() => { animateButton(); navigation.navigate('Profile'); }}
               >
-                <Text style={styles.iconWrapper}>
-                  <Icon name="user" size={24} color="#FFF" style={styles.icon} />
-                </Text>
+                <View style={styles.iconWrapper}>
+                  <Icon name="user" size={24} color="#FFF" />
+                </View>
               </TouchableOpacity>
             </Animated.View>
             <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
@@ -108,7 +110,7 @@ export default function HomeScreen({ navigation }) {
                 style={styles.rectangleButton}
                 onPress={() => { animateButton(); navigation.navigate('Messages'); }}
               >
-                <Text style={styles.buttonText}>Invia Messaggio</Text>
+                <Text style={styles.buttonText}>{t('sendMessage')}</Text>
               </TouchableOpacity>
             </Animated.View>
             <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
@@ -116,9 +118,9 @@ export default function HomeScreen({ navigation }) {
                 style={[styles.roundButton, styles.bottomButton]}
                 onPress={() => { animateButton(); handleLogout(); }}
               >
-                <Text style={styles.iconWrapper}>
-                  <Icon name="sign-out" size={24} color="#FFF" style={styles.icon} />
-                </Text>
+                <View style={styles.iconWrapper}>
+                  <Icon name="sign-out" size={24} color="#FFF" />
+                </View>
               </TouchableOpacity>
             </Animated.View>
           </View>
@@ -129,7 +131,7 @@ export default function HomeScreen({ navigation }) {
                 style={styles.rectangleButton}
                 onPress={() => { animateButton(); navigation.navigate('Login'); }}
               >
-                <Text style={styles.buttonText}>Login</Text>
+                <Text style={styles.buttonText}>{t('login')}</Text>
               </TouchableOpacity>
             </Animated.View>
             <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
@@ -137,7 +139,7 @@ export default function HomeScreen({ navigation }) {
                 style={styles.rectangleButton}
                 onPress={() => { animateButton(); navigation.navigate('Register'); }}
               >
-                <Text style={styles.buttonText}>Registrati</Text>
+                <Text style={styles.buttonText}>{t('register')}</Text>
               </TouchableOpacity>
             </Animated.View>
           </View>
@@ -150,7 +152,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFACD', // Colore di sfondo giallo pallido
+    backgroundColor: '#FFFACD',
   },
   container: {
     flex: 1,
@@ -159,12 +161,12 @@ const styles = StyleSheet.create({
   },
   topLeftButton: {
     position: 'absolute',
-    top: 50, // Sposta il pulsante più in basso
+    top: 50,
     left: 20,
   },
   topRightButton: {
     position: 'absolute',
-    top: 50, // Sposta il pulsante più in basso
+    top: 50,
     right: 20,
   },
   title: {
@@ -172,13 +174,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   largeButton: {
-    width: 280, // Dimensioni del pulsante quadrato grande
+    width: 280,
     height: 450,
-    backgroundColor: '#32CD32', // Colore verde
+    backgroundColor: '#32CD32',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20, // Spazio tra il pulsante grande e i pulsanti in basso
-    borderRadius: 10, // Arrotonda gli angoli del pulsante
+    marginBottom: 20,
+    borderRadius: 10,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -189,12 +191,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   roundButton: {
-    backgroundColor: '#32CD32', // Verde
+    backgroundColor: '#32CD32',
     borderRadius: 50,
     width: 60,
     height: 60,
-    justifyContent: 'center', // Centra verticalmente
-    alignItems: 'center', // Centra orizzontalmente
+    justifyContent: 'center',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
@@ -202,24 +204,21 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   iconWrapper: {
-    textAlign: 'center', // Centra l'icona orizzontalmente
-    textAlignVertical: 'center', // Centra l'icona verticalmente
-    width: '100%', // Assicura che l'icona occupi l'intera area del pulsante
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
     height: '100%',
   },
-  icon: {
-    alignSelf: 'center', // Allinea l'icona al centro orizzontalmente
-  },
   bottomButton: {
-    alignItems: 'center', // Allineamento centrale
+    alignItems: 'center',
   },
   rectangleButton: {
-    backgroundColor: '#32CD32', // Verde
+    backgroundColor: '#32CD32',
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    justifyContent: 'center', // Centra verticalmente
-    alignItems: 'center', // Centra orizzontalmente
+    justifyContent: 'center',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
