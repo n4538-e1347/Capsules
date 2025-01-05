@@ -10,6 +10,28 @@ const app = express();
 const trimString = (str) => str.trim();
 //const Schema = mongoose.Schema;
 const Schema = mongoose.Schema;
+
+const i18next = require('i18next');
+const i18nextMiddleware = require('i18next-http-middleware');
+const i18nextFsBackend = require('i18next-fs-backend');
+
+
+i18next
+  .use(i18nextFsBackend)
+  .use(i18nextMiddleware.LanguageDetector)
+  .init({
+    fallbackLng: 'en',
+    preload: ['en', 'it', 'de', 'es', 'fr'],
+    backend: {
+      loadPath: __dirname + '/locales/{{lng}}/translation.json'
+    },
+    detection: {
+      order: ['querystring', 'cookie', 'header'],
+      caches: ['cookie']
+    }
+  });
+
+app.use(i18nextMiddleware.handle(i18next));
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));  // Aggiungi questa linea per gestire i dati urlencoded
@@ -67,10 +89,9 @@ const addPremiumField = async () => {
 // Chiamare la funzione per aggiornare gli utenti esistenti
 //addPremiumField();
 
-
 // Rotta di Prova per la Radice
 app.get('/', (req, res) => {
-    res.send('Benvenuto al server di messaggistica!');
+    res.send(req.t('welcome'));
 });
 
 // API di Registrazione
@@ -82,27 +103,24 @@ app.post('/register', async (req, res) => {
     password = trimString(password);
     email = trimString(email);
 
-    console.log(`Received data: ${JSON.stringify({ username, password, email })}`);
     try {
         const existingUser = await User.findOne({ username });
         const existingEmail = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).send('Username già in uso');
+            return res.status(400).send(req.t('usernameTaken'));
         }
         if (existingEmail) {
-            return res.status(400).send('Email già in uso');
+            return res.status(400).send(req.t('emailTaken'));
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({ username, password: hashedPassword, email });
         await newUser.save();
-        res.status(201).send('Utente registrato con successo');
+        res.status(201).send(req.t('registrationSuccess'));
     } catch (error) {
         console.error('Errore nella registrazione:', error.message);
         res.status(500).send(`Errore nella registrazione: ${error.message}`);
     }
 });
-
-
 
 // API di Login
 app.post('/login', async (req, res) => {
@@ -112,7 +130,6 @@ app.post('/login', async (req, res) => {
     username = trimString(username);
     password = trimString(password);
 
-    console.log(`Received data: ${JSON.stringify({ username, password })}`);
     try {
         const user = await User.findOne({ username });
         if (user && await bcrypt.compare(password, user.password)) {
@@ -123,7 +140,7 @@ app.post('/login', async (req, res) => {
                 language: user.language
             });
         } else {
-            res.status(400).send('Username o password non corretti');
+            res.status(400).send(req.t('loginError'));
         }
     } catch (error) {
         console.error('Errore nel login:', error.message);
@@ -131,15 +148,13 @@ app.post('/login', async (req, res) => {
     }
 });
 
-
-
 // API per Richiedere il Reset della Password
 app.post('/requestPasswordReset', async (req, res) => {
     const { email } = req.body;
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).send('Utente non trovato');
+            return res.status(404).send(req.t('userNotFound'));
         }
 
         const token = crypto.randomBytes(20).toString('hex');
@@ -159,21 +174,21 @@ app.post('/requestPasswordReset', async (req, res) => {
         const mailOptions = {
             to: user.email,
             from: 'passwordreset@demo.com',
-            subject: 'Reset della Password',
-            text: `Hai richiesto un reset della password. Clicca sul seguente link per completare il processo: \n\n
+            subject: req.t('resetPasswordSubject'),
+            text: `${req.t('resetPasswordText')} \n\n
                    http://${req.headers.host}/reset/${token} \n\n`
         };
 
         transporter.sendMail(mailOptions, (error, response) => {
             if (error) {
                 console.error('Errore durante l\'invio dell\'email:', error);
-                res.status(500).send('Errore durante l\'invio dell\'email');
+                res.status(500).send(req.t('emailError'));
             } else {
-                res.status(200).send('Email di reset della password inviata con successo');
+                res.status(200).send(req.t('emailSent'));
             }
         });
     } catch (error) {
-        res.status(500).send('Errore nella richiesta di reset della password');
+        res.status(500).send(req.t('resetPasswordRequestError'));
     }
 });
 
@@ -194,7 +209,7 @@ app.post('/resetPassword', async (req, res) => {
         });
         if (!user) {
             console.error('Token non valido o scaduto');
-            return res.status(400).json({ error: 'Token non valido o scaduto' });
+            return res.status(400).json({ error: req.t('invalidToken') });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -203,10 +218,10 @@ app.post('/resetPassword', async (req, res) => {
         user.resetPasswordExpires = undefined;
         await user.save();
 
-        res.status(200).json({ message: 'Password resettata con successo' });
+        res.status(200).json({ message: req.t('passwordResetSuccess') });
     } catch (error) {
         console.error('Errore nel reset della password:', error.message);
-        res.status(500).json({ error: 'Errore nel reset della password' });
+        res.status(500).json({ error: req.t('passwordResetError') });
     }
 });
 
@@ -219,13 +234,13 @@ app.post('/sendMessage', async (req, res) => {
         if (friend) {
             const newMessage = new Message({ sender, receiver, message });
             await newMessage.save();
-            res.status(201).send('Messaggio inviato con successo');
+            res.status(201).send(req.t('messageSent'));
         } else {
-            res.status(403).send('Il destinatario non è tra i tuoi amici');
+            res.status(403).send(req.t('notAFriend'));
         }
     } catch (error) {
         console.error(`Errore nell'invio del messaggio: ${error.message}`);
-        res.status(500).send(`Errore nell'invio del messaggio: ${error.message}`);
+        res.status(500).send(req.t('sendMessageError'));
     }
 });
 
@@ -233,21 +248,21 @@ app.post('/sendMessage', async (req, res) => {
 app.post('/sendFriendRequest', async (req, res) => {
     const { username, friendUsername, message } = req.body;
     if (username === friendUsername) {
-        return res.status(400).send('Sei già il miglior amico di te stesso (o almeno dovresti!)');
+        return res.status(400).send(req.t('selfFriendRequest'));
     }
     try {
         const user = await User.findOne({ username });
         const friend = await User.findOne({ username: friendUsername });
         if (!user) {
-            return res.status(404).send('Utente non trovato');
+            return res.status(404).send(req.t('userNotFound'));
         }
         if (!friend) {
-            return res.status(404).send('L\'utente non esiste');
+            return res.status(404).send(req.t('friendNotFound'));
         }
 
         // Verifica se uno dei due utenti ha bloccato l'altro
         if (user.blockedUsers.includes(friend._id) || friend.blockedUsers.includes(user._id)) {
-            return res.status(404).send('Utente non trovato');
+            return res.status(404).send(req.t('userNotFound'));
         }
 
         // Verifica se esiste già una richiesta pendente in entrambe le direzioni
@@ -257,12 +272,12 @@ app.post('/sendFriendRequest', async (req, res) => {
         const reverseSentRequest = friend.sentRequests.some(req => req.userId.equals(user._id));
 
         if (existingFriendRequest || existingSentRequest || reverseFriendRequest || reverseSentRequest) {
-            return res.status(400).send('Hai una richiesta in sospeso con questo contatto');
+            return res.status(400).send(req.t('pendingRequest'));
         }
 
         // Verifica se sono già amici
         if (user.friends.includes(friend._id)) {
-            return res.status(400).send('Siete già amici');
+            return res.status(400).send(req.t('alreadyFriends'));
         }
 
         const request = { userId: user._id, username: user.username, message };
@@ -271,13 +286,12 @@ app.post('/sendFriendRequest', async (req, res) => {
         await friend.save();
         await user.save();
 
-        res.status(200).send('Richiesta di amicizia inviata con successo');
+        res.status(200).send(req.t('friendRequestSent'));
     } catch (error) {
         console.error(`Errore nell'invio della richiesta di amicizia: ${error.message}`);
-        res.status(500).send(`Errore nell'invio della richiesta di amicizia: ${error.message}`);
+        res.status(500).send(req.t('sendFriendRequestError'));
     }
 });
-
 // API per Confermare Richieste di Amicizia
 app.post('/confirmFriendRequest', async (req, res) => {
     const { username, friendUsername } = req.body;
@@ -289,7 +303,7 @@ app.post('/confirmFriendRequest', async (req, res) => {
             // Verifica se esiste una richiesta di amicizia da parte di `friend`
             const friendRequest = user.friendRequests.find(req => req.userId.equals(friend._id));
             if (!friendRequest) {
-                return res.status(400).send('Nessuna richiesta di amicizia trovata');
+                return res.status(400).send('No friend request found');
             }
 
             // Rimuovi la richiesta di amicizia reciproca (se esiste)
@@ -307,13 +321,13 @@ app.post('/confirmFriendRequest', async (req, res) => {
             await user.save();
             await friend.save();
 
-            res.status(200).send('Richiesta di amicizia confermata e richieste reciproche rimosse');
+            res.status(200).send('Friend request confirmed and mutual requests removed');
         } else {
-            res.status(404).send('Utente non trovato');
+            res.status(404).send('User not found');
         }
     } catch (error) {
-        console.error(`Errore nella conferma della richiesta di amicizia: ${error.message}`);
-        res.status(500).send(`Errore nella conferma della richiesta di amicizia: ${error.message}`);
+        console.error(`Error confirming friend request: ${error.message}`);
+        res.status(500).send(`Error confirming friend request: ${error.message}`);
     }
 });
 
@@ -326,7 +340,7 @@ app.post('/rejectFriendRequest', async (req, res) => {
         if (user && friend) {
             const request = user.friendRequests.find(req => req.userId.toString() === friend._id.toString());
             if (!request) {
-                return res.status(400).send('Nessuna richiesta di amicizia trovata');
+                return res.status(400).send('No friend request found');
             }
 
             user.friendRequests = user.friendRequests.filter(req => req.userId.toString() !== friend._id.toString());
@@ -339,13 +353,13 @@ app.post('/rejectFriendRequest', async (req, res) => {
             await user.save();
             await friend.save();
 
-            res.status(200).send('Richiesta di amicizia rifiutata');
+            res.status(200).send('Friend request rejected');
         } else {
-            res.status(404).send('Utente non trovato');
+            res.status(404).send('User not found');
         }
     } catch (error) {
-        console.error(`Errore nel rifiuto della richiesta di amicizia: ${error.message}`);
-        res.status(500).send(`Errore nel rifiuto della richiesta di amicizia: ${error.message}`);
+        console.error(`Error rejecting friend request: ${error.message}`);
+        res.status(500).send(`Error rejecting friend request: ${error.message}`);
     }
 });
 
@@ -358,7 +372,7 @@ app.post('/rejectAndBlockFriendRequest', async (req, res) => {
         if (user && friend) {
             const request = user.friendRequests.find(req => req.userId.toString() === friend._id.toString());
             if (!request) {
-                return res.status(400).send('Nessuna richiesta di amicizia trovata');
+                return res.status(400).send('No friend request found');
             }
 
             user.friendRequests = user.friendRequests.filter(req => req.userId.toString() !== friend._id.toString());
@@ -372,13 +386,13 @@ app.post('/rejectAndBlockFriendRequest', async (req, res) => {
             await user.save();
             await friend.save();
 
-            res.status(200).send('Richiesta di amicizia rifiutata e utente bloccato');
+            res.status(200).send('Friend request rejected and user blocked');
         } else {
-            res.status(404).send('Utente non trovato');
+            res.status(404).send('User not found');
         }
     } catch (error) {
-        console.error(`Errore nel rifiuto e blocco della richiesta di amicizia: ${error.message}`);
-        res.status(500).send(`Errore nel rifiuto e blocco della richiesta di amicizia: ${error.message}`);
+        console.error(`Error rejecting and blocking friend request: ${error.message}`);
+        res.status(500).send(`Error rejecting and blocking friend request: ${error.message}`);
     }
 });
 
@@ -391,7 +405,7 @@ app.post('/withdrawFriendRequest', async (req, res) => {
         if (user && friend) {
             const requestIndex = user.sentRequests.findIndex(req => req.userId.toString() === friend._id.toString());
             if (requestIndex === -1) {
-                return res.status(400).send('Nessuna richiesta di amicizia trovata');
+                return res.status(400).send('No friend request found');
             }
 
             user.sentRequests.splice(requestIndex, 1);
@@ -399,13 +413,13 @@ app.post('/withdrawFriendRequest', async (req, res) => {
             await user.save();
             await friend.save();
 
-            res.status(200).send('Richiesta di amicizia ritirata');
+            res.status(200).send('Friend request withdrawn');
         } else {
-            res.status(404).send('Utente non trovato');
+            res.status(404).send('User not found');
         }
     } catch (error) {
-        console.error(`Errore nel ritiro della richiesta di amicizia: ${error.message}`);
-        res.status(500).send(`Errore nel ritiro della richiesta di amicizia: ${error.message}`);
+        console.error(`Error withdrawing friend request: ${error.message}`);
+        res.status(500).send(`Error withdrawing friend request: ${error.message}`);
     }
 });
 
@@ -432,13 +446,13 @@ app.post('/removeFriend', async (req, res) => {
             await user.save();
             await friend.save();
 
-            res.status(200).send('Amico rimosso con successo e richieste di amicizia in sospeso cancellate');
+            res.status(200).send('Friend removed successfully and pending friend requests deleted');
         } else {
-            res.status(404).send('Utente non trovato');
+            res.status(404).send('User not found');
         }
     } catch (error) {
-        console.error(`Errore nella rimozione dell'amico: ${error.message}`);
-        res.status(500).send(`Errore nella rimozione dell'amico: ${error.message}`);
+        console.error(`Error removing friend: ${error.message}`);
+        res.status(500).send(`Error removing friend: ${error.message}`);
     }
 });
 
@@ -449,7 +463,7 @@ app.post('/blockUser', async (req, res) => {
         const user = await User.findOne({ username });
         const blockUser = await User.findOne({ username: blockUsername });
         if (!user || !blockUser) {
-            return res.status(404).send('Utente non trovato');
+            return res.status(404).send('User not found');
         }
 
         if (!user.blockedUsers.includes(blockUser._id)) {
@@ -457,10 +471,10 @@ app.post('/blockUser', async (req, res) => {
         }
 
         await user.save();
-        res.status(200).send('Utente bloccato con successo');
+        res.status(200).send('User successfully blocked');
     } catch (error) {
-        console.error(`Errore nel blocco dell'utente: ${error.message}`);
-        res.status(500).send(`Errore nel blocco dell'utente: ${error.message}`);
+        console.error(`Error blocking user: ${error.message}`);
+        res.status(500).send(`Error blocking user: ${error.message}`);
     }
 });
 
@@ -479,13 +493,13 @@ app.post('/removeAndBlockFriend', async (req, res) => {
             await user.save();
             await friend.save();
 
-            res.status(200).send('Amico rimosso e bloccato con successo');
+            res.status(200).send('Friend successfully removed and blocked');
         } else {
-            res.status(404).send('Utente non trovato');
+            res.status(404).send('User not found');
         }
     } catch (error) {
-        console.error(`Errore nella rimozione e blocco dell'amico: ${error.message}`);
-        res.status(500).send(`Errore nella rimozione e blocco dell'amico: ${error.message}`);
+        console.error(`Error removing and blocking friend: ${error.message}`);
+        res.status(500).send(`Error removing and blocking friend: ${error.message}`);
     }
 });
 
@@ -496,16 +510,16 @@ app.post('/unblockUser', async (req, res) => {
         const user = await User.findOne({ username });
         const unblockUser = await User.findOne({ username: unblockUsername });
         if (!user || !unblockUser) {
-            return res.status(404).send('Utente non trovato');
+            return res.status(404).send('User not found');
         }
 
         user.blockedUsers = user.blockedUsers.filter(blockedId => blockedId.toString() !== unblockUser._id.toString());
 
         await user.save();
-        res.status(200).send('Utente sbloccato con successo');
+        res.status(200).send('User successfully unblocked');
     } catch (error) {
-        console.error(`Errore nello sblocco dell'utente: ${error.message}`);
-        res.status(500).send(`Errore nello sblocco dell'utente: ${error.message}`);
+        console.error(`Error unblocking user: ${error.message}`);
+        res.status(500).send(`Error unblocking user: ${error.message}`);
     }
 });
 
@@ -545,25 +559,25 @@ app.post('/deleteAccount', async (req, res) => {
             // Elimina l'account dell'utente
             await User.deleteOne({ _id: user._id });
 
-            res.status(200).send('Account eliminato con successo e tutti i dati relativi sono stati rimossi');
+            res.status(200).send('Account successfully deleted and all related data removed');
         } else {
-            res.status(404).send('Utente non trovato');
+            res.status(404).send('User not found');
         }
     } catch (error) {
-        console.error(`Errore nell'eliminazione dell'account: ${error.message}`);
-        res.status(500).send(`Errore nell'eliminazione dell'account: ${error.message}`);
+        console.error(`Error deleting account: ${error.message}`);
+        res.status(500).send(`Error deleting account: ${error.message}`);
     }
 });
 
 // API per Archiviare i Messaggi
 app.post('/archiveMessage', async (req, res) => {
-  const { messageId } = req.body;
-  try {
-    await Message.findByIdAndUpdate(messageId, { archived: true });
-    res.status(200).send('Message archived');
-  } catch (error) {
-    res.status(500).send('Error archiving message');
-  }
+    const { messageId } = req.body;
+    try {
+        await Message.findByIdAndUpdate(messageId, { archived: true });
+        res.status(200).send('Message archived');
+    } catch (error) {
+        res.status(500).send('Error archiving message');
+    }
 });
 
 // API per Aggiornare la Lingua
@@ -571,9 +585,9 @@ app.post('/updateLanguage', async (req, res) => {
   const { username, language } = req.body;
   try {
     await User.findOneAndUpdate({ username }, { language });
-    res.status(200).send('Lingua aggiornata con successo');
+    res.status(200).send('Language successfully updated');
   } catch (error) {
-    res.status(500).send('Errore nell\'aggiornamento della lingua');
+    res.status(500).send('Error updating language');
   }
 });
 
@@ -583,12 +597,12 @@ app.get('/friendRequests/:username', async (req, res) => {
     try {
         const user = await User.findOne({ username }).populate('friendRequests.userId');
         if (!user) {
-            return res.status(404).send('Utente non trovato');
+            return res.status(404).send('User not found');
         }
         res.status(200).json(user.friendRequests);
     } catch (error) {
-        console.error(`Errore nel recupero delle richieste di amicizia: ${error.message}`);
-        res.status(500).send(`Errore nel recupero delle richieste di amicizia: ${error.message}`);
+        console.error(`Error retrieving friend requests: ${error.message}`);
+        res.status(500).send(`Error retrieving friend requests: ${error.message}`);
     }
 });
 
@@ -598,7 +612,7 @@ app.get('/sentFriendRequests/:username', async (req, res) => {
     try {
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(404).send('Utente non trovato');
+            return res.status(404).send('User not found');
         }
         const sentRequests = user.sentRequests.map(request => ({
             username: request.username,
@@ -607,23 +621,22 @@ app.get('/sentFriendRequests/:username', async (req, res) => {
         }));
         res.status(200).json(sentRequests);
     } catch (error) {
-        console.error(`Errore nel recupero delle richieste di amicizia inviate: ${error.message}`);
-        res.status(500).send(`Errore nel recupero delle richieste di amicizia inviate: ${error.message}`);
+        console.error(`Error retrieving sent friend requests: ${error.message}`);
+        res.status(500).send(`Error retrieving sent friend requests: ${error.message}`);
     }
 });
-
 // API per Visualizzare la Lista dei Contatti
 app.get('/contacts/:username', async (req, res) => {
     const { username } = req.params;
     try {
         const user = await User.findOne({ username }).populate('friends');
         if (!user) {
-            return res.status(404).send('Utente non trovato');
+            return res.status(404).send('User not found');
         }
         res.status(200).json(user.friends);
     } catch (error) {
-        console.error(`Errore nel recupero dei contatti: ${error.message}`);
-        res.status(500).send(`Errore nel recupero dei contatti: ${error.message}`);
+        console.error(`Error retrieving contacts: ${error.message}`);
+        res.status(500).send(`Error retrieving contacts: ${error.message}`);
     }
 });
 
@@ -634,7 +647,7 @@ app.get('/messages/:username', async (req, res) => {
         const messages = await Message.find({ receiver: username });
         res.status(200).json(messages);
     } catch (error) {
-        res.status(500).send('Errore nel recupero dei messaggi');
+        res.status(500).send('Error retrieving messages');
     }
 });
 
@@ -645,7 +658,7 @@ app.get('/reset/:token', (req, res) => {
 
     fs.readFile(path.join(__dirname, 'reset.html'), 'utf8', (err, data) => {
         if (err) {
-            res.status(500).send('Errore nel caricamento della pagina di reset');
+            res.status(500).send('Error loading reset page');
         } else {
             const page = data.replace('<%= token %>', token).replace('<%= lang %>', lang);
             console.log(`Sending page with token: ${token} and lang: ${lang}`);  // Logging del token e della lingua
@@ -659,12 +672,12 @@ app.get('/blockedUsers/:username', async (req, res) => {
     try {
         const user = await User.findOne({ username }).populate('blockedUsers');
         if (!user) {
-            return res.status(404).send('Utente non trovato');
+            return res.status(404).send('User not found');
         }
         res.status(200).json(user.blockedUsers);
     } catch (error) {
-        console.error(`Errore nel recupero degli utenti bloccati: ${error.message}`);
-        res.status(500).send(`Errore nel recupero degli utenti bloccati: ${error.message}`);
+        console.error(`Error retrieving blocked users: ${error.message}`);
+        res.status(500).send(`Error retrieving blocked users: ${error.message}`);
     }
 });
 

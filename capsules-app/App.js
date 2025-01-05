@@ -18,6 +18,7 @@ import RequestPasswordResetScreen from './screens/RequestPasswordResetScreen';
 import ResetPasswordScreen from './screens/ResetPasswordScreen';
 import ArchivedMessagesScreen from './screens/ArchivedMessagesScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import LanguageScreen from './screens/LanguageScreen';
 import './i18n'; // Importa la configurazione di i18next
 
 const Stack = createStackNavigator();
@@ -66,7 +67,8 @@ export default function App() {
               <Stack.Screen name="RequestPasswordReset" component={RequestPasswordResetScreen} />
               <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
 			  <Stack.Screen name="ArchivedMessagesScreen" component={ArchivedMessagesScreen} />
-			  <Stack.Screen name="SettingsScreen" component={SettingsScreen} />			  
+			  <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+			  <Stack.Screen name="LanguageScreen" component={LanguageScreen} />				  
             </Stack.Navigator>
           </SafeAreaView>
         </NavigationContainer>

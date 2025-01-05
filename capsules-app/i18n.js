@@ -89,7 +89,9 @@ const resources = {
       messages: 'Messages',
       selectFriend: 'Select a friend',
       writeMessage: 'Write a message',
-      send: 'Send'	  
+      send: 'Send',
+	  language: 'Language',
+	  sounds: 'Sounds'
     }
   },
   it: {
@@ -180,7 +182,9 @@ const resources = {
       messages: 'Messaggi',
       selectFriend: 'Seleziona un amico',
       writeMessage: 'Scrivi un messaggio',
-      send: 'Invia'	  
+      send: 'Invia',
+	  language: 'Lingua',
+	  sounds: 'Suoni'	  
     }
   },
   de: {
@@ -271,7 +275,9 @@ const resources = {
       messages: 'Nachrichten',
       selectFriend: 'Wähle einen Freund',
       writeMessage: 'Schreibe eine Nachricht',
-      send: 'Senden'	  
+      send: 'Senden',
+	  language: 'Sprache',
+	  sounds: 'Klänge'	  
     }
   },
   es: {
@@ -362,7 +368,9 @@ const resources = {
       messages: 'Mensajes',
       selectFriend: 'Selecciona un amigo',
       writeMessage: 'Escribe un mensaje',
-      send: 'Enviar'	  
+      send: 'Enviar',
+	  language: 'Idioma',
+	  sounds: 'Sonidos'		  
     }
   },
   fr: {
@@ -453,7 +461,9 @@ const resources = {
       messages: 'Messages',
       selectFriend: 'Sélectionnez un ami',
       writeMessage: 'Écrire un message',
-      send: 'Envoyer'	  
+      send: 'Envoyer',
+	  language: 'Langue',
+	  sounds: 'Sons'		  
     }
   },
   // Aggiungi altre lingue qui

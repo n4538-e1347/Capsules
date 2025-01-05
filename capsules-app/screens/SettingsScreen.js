@@ -1,67 +1,34 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
-import { AuthContext } from '../contexts/AuthContext'; // Importa il contesto AuthContext
 
 export default function SettingsScreen({ navigation }) {
-  const { t, i18n } = useTranslation();
-  const { user } = useContext(AuthContext); // Ottieni user dal contesto Auth
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
+  const [soundsEnabled, setSoundsEnabled] = useState(true); // Stato per i suoni
 
-  useEffect(() => {
-    // Controllo utente al montaggio del componente
-    if (!user || !user.username) {
-      Alert.alert(
-        t('error'),
-        t('userNotAuthenticated'),
-        [{ text: t('ok'), onPress: () => navigation.goBack() }]
-      );
-    }
-  }, [user, navigation, t]);
-
-  // Funzione per cambiare lingua
-  const changeLanguage = async (language) => {
-    if (!user || !user.username) {
-      console.error('Errore: utente non autenticato');
-      Alert.alert(t('error'), t('userNotAuthenticated'));
-      return;
-    }
-
-    try {
-      const response = await axios.post('http://192.168.1.14:3000/updateLanguage', {
-        username: user.username,
-        language,
-      });
-
-      console.log('Risposta del server:', response.data); // Debug
-      i18n.changeLanguage(language);
-      setSelectedLanguage(language);
-    } catch (error) {
-      console.error('Errore nell\'aggiornamento della lingua', error?.response?.data || error.message);
-      Alert.alert(t('error'), t('languageUpdateFailed'));
-    }
+  // Funzione per attivare/disattivare i suoni
+  const toggleSounds = () => {
+    setSoundsEnabled(!soundsEnabled);
+    // Aggiungi qui la logica per attivare o disattivare i suoni dell'app
+    console.log(`I suoni sono ora ${soundsEnabled ? 'disattivati' : 'attivati'}`);
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.title}>{t('settingsTitle')}</Text>
-        <TouchableOpacity onPress={() => changeLanguage('en')} style={styles.languageButton}>
-          <Text style={selectedLanguage === 'en' ? styles.selectedText : styles.buttonText}>{t('english')}</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('LanguageScreen')}
+        >
+          <Text style={styles.buttonText}>{t('language')}</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => changeLanguage('it')} style={styles.languageButton}>
-          <Text style={selectedLanguage === 'it' ? styles.selectedText : styles.buttonText}>{t('italian')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => changeLanguage('de')} style={styles.languageButton}>
-          <Text style={selectedLanguage === 'de' ? styles.selectedText : styles.buttonText}>{t('german')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => changeLanguage('es')} style={styles.languageButton}>
-          <Text style={selectedLanguage === 'es' ? styles.selectedText : styles.buttonText}>{t('spanish')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => changeLanguage('fr')} style={styles.languageButton}>
-          <Text style={selectedLanguage === 'fr' ? styles.selectedText : styles.buttonText}>{t('french')}</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={toggleSounds}
+        >
+          <Text style={styles.buttonText}>{soundsEnabled ? t('sounds') + ' On' : t('sounds') + ' Off'}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.bottomContainer}>
@@ -70,9 +37,7 @@ export default function SettingsScreen({ navigation }) {
           onPress={() => navigation.goBack()}
         >
           <Text style={styles.iconWrapper}>
-            <Text>
-              <Icon name="arrow-left" size={24} color="#FFF" />
-            </Text>
+            <Icon name="arrow-left" size={24} color="#FFF" />
           </Text>
         </TouchableOpacity>
       </View>
@@ -94,18 +59,17 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
   },
-  languageButton: {
+  button: {
     padding: 10,
     backgroundColor: '#32CD32',
     borderRadius: 5,
     marginVertical: 5,
+    width: 200, // Larghezza fissa per i pulsanti
+    alignItems: 'center', // Centra il testo orizzontalmente
   },
   buttonText: {
     color: '#FFF',
-  },
-  selectedText: {
-    color: '#FFF',
-    fontWeight: 'bold',
+    fontSize: 18, // Aumenta la dimensione del testo per una migliore leggibilità
   },
   bottomContainer: {
     flexDirection: 'row',
