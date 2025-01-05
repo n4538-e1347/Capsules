@@ -92,7 +92,16 @@ const resources = {
       send: 'Send',
 	  language: 'Language',
 	  sounds: 'Sounds',
-	  confirmSend: "Do you confirm sending?"
+	  confirmSend: "Do you confirm sending?",
+	  username: "Username",
+	  email: "Email",
+	  hideEmail: "Hide Email",
+	  showEmail: "Show Email",
+	  premiumStatus: "Premium User",
+	  NoMoreCapsules: "You have no more capsules!",
+	  openCapsulePrompt: "Do you wish to open a capsule?",
+	  removeFriendMessage: "Do you want to remove this contact?",
+	  blockFriendMessage: "Do you want to block this contact?"	  
     }
   },
   it: {
@@ -186,7 +195,16 @@ const resources = {
       send: 'Invia',
 	  language: 'Lingua',
 	  sounds: 'Suoni',
-	  confirmSend: "Confermi l'invio?"
+	  confirmSend: "Confermi l'invio?",
+	  username: "Username",
+	  email: "e-mail",
+	  hideEmail: "Nascondi e-mail",
+	  showEmail: "Mostra e-mail",
+	  premiumStatus: "Utente Premium",
+	  NoMoreCapsules: "Hai finito le capsule!",
+	  openCapsulePrompt: "Vuoi aprire una capsula?",
+	  removeFriendMessage: "Vuoi rimuovere il contatto?",
+	  blockFriendMessage: "Vuoi bloccare il contatto?"
     }
   },
   de: {
@@ -280,7 +298,16 @@ const resources = {
       send: 'Senden',
 	  language: 'Sprache',
 	  sounds: 'Klänge',
-	  confirmSend: "Bestätigen Sie das Senden?"
+	  confirmSend: "Bestätigen Sie das Senden?",
+	  username: "Benutzername",
+	  email: "E-Mail",
+	  hideEmail: "E-Mail verbergen",
+	  showEmail: "E-Mail anzeigen",
+	  premiumStatus: "Premium-Benutzer",
+	  NoMoreCapsules: "Du hast keine Kapseln mehr!",
+	  openCapsulePrompt: "Möchtest du eine Kapsel öffnen?",
+	  removeFriendMessage: "Möchtest du diesen Kontakt entfernen?",
+	  blockFriendMessage: "Möchtest du diesen Kontakt blockieren?"	  
     }
   },
   es: {
@@ -374,7 +401,16 @@ const resources = {
       send: 'Enviar',
 	  language: 'Idioma',
 	  sounds: 'Sonidos',
-	  confirmSend: "¿Confirmas el envío?"
+	  confirmSend: "¿Confirmas el envío?",
+	  username: "Nombre de usuario",
+	  email: "Correo electrónico",
+	  hideEmail: "Ocultar correo electrónico",
+	  showEmail: "Mostrar correo electrónico",
+	  premiumStatus: "Usuario Premium",
+	  NoMoreCapsules: "¡No tienes más cápsulas!",
+	  openCapsulePrompt: "¿Quieres abrir una cápsula?",
+	  removeFriendMessage: "¿Quieres eliminar este contacto?",
+	  blockFriendMessage: "¿Quieres bloquear este contacto?"	  
     }
   },
   fr: {
@@ -468,7 +504,16 @@ const resources = {
       send: 'Envoyer',
 	  language: 'Langue',
 	  sounds: 'Sons',
-	  confirmSend: "Confirmez-vous l'envoi?"
+	  confirmSend: "Confirmez-vous l'envoi?",
+	  username: "Nom d'utilisateur",
+	  email: "Email",
+	  hideEmail: "Masquer l'email",
+	  showEmail: "Afficher l'email",
+	  premiumStatus: "Utilisateur Premium",
+	  NoMoreCapsules: "Vous n'avez plus de capsules!",
+	  openCapsulePrompt: "Voulez-vous ouvrir une capsule?",
+	  removeFriendMessage: "Voulez-vous supprimer ce contact?",
+	  blockFriendMessage: "Voulez-vous bloquer ce contact?"	  
     }
   },
   // Aggiungi altre lingue qui

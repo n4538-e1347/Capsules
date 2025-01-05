@@ -1,18 +1,20 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Importa le icone
+import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import Modal from 'react-native-modal';
-import { useTranslation } from 'react-i18next'; // Importa il hook useTranslation
+import { useTranslation } from 'react-i18next';
 
 export default function HomeScreen({ navigation }) {
-  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
+  const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useContext(AuthContext);
   const scaleValue = useState(new Animated.Value(1))[0];
   const [messages, setMessages] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [randomMessage, setRandomMessage] = useState('');
+  const [noMessagesModalVisible, setNoMessagesModalVisible] = useState(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
 
   useEffect(() => {
     if (user && user.username) {
@@ -23,7 +25,7 @@ export default function HomeScreen({ navigation }) {
   const fetchMessages = async () => {
     try {
       const response = await axios.get(`http://192.168.1.14:3000/messages/${user.username}`);
-      setMessages(response.data.filter(msg => !msg.archived)); // Filtra solo i messaggi non archiviati
+      setMessages(response.data.filter(msg => !msg.archived));
     } catch (error) {
       alert(`Errore nel recupero dei messaggi: ${error.message}`);
     }
@@ -32,7 +34,7 @@ export default function HomeScreen({ navigation }) {
   const archiveMessage = async (messageId) => {
     try {
       await axios.post('http://192.168.1.14:3000/archiveMessage', { messageId });
-      fetchMessages(); // Aggiorna i messaggi dopo l'archiviazione
+      fetchMessages();
     } catch (error) {
       alert(`Errore nell'archiviazione del messaggio: ${error.message}`);
     }
@@ -51,124 +53,149 @@ export default function HomeScreen({ navigation }) {
   };
 
   const showRandomMessage = () => {
-    if (messages.length > 0) {
-      const randomIndex = Math.floor(Math.random() * messages.length);
-      const selectedMessage = messages[randomIndex];
-      setRandomMessage(selectedMessage.message);
-      setModalVisible(true);
-      archiveMessage(selectedMessage._id); // Archivia il messaggio visualizzato
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    const selectedMessage = messages[randomIndex];
+    setRandomMessage(selectedMessage.message);
+    setModalVisible(true);
+    archiveMessage(selectedMessage._id);
+  };
+
+  const confirmOpenCapsule = () => {
+    if (messages.length === 0) {
+      setNoMessagesModalVisible(true);
     } else {
-      alert("Nessun messaggio disponibile");
+      setConfirmModalVisible(true);
     }
   };
 
-return (
-  <SafeAreaView style={styles.safeArea}>
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={[styles.roundButton, styles.topLeftButton]}
-        onPress={() => {
-          animateButton();
-          navigation.navigate('ArchivedMessagesScreen');
-        }}
-      >
-        <View style={styles.iconWrapper}>
-          <Icon name="envelope-open" size={24} color="#FFF" style={styles.icon} />
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.roundButton, styles.topRightButton]}
-        onPress={() => {
-          animateButton();
-          navigation.navigate('SettingsScreen');
-        }}
-      >
-        <View style={styles.iconWrapper}>
-          <Icon name="cog" size={24} color="#FFF" style={styles.icon} />
-        </View>
-      </TouchableOpacity>
-      <Text style={[styles.title, { marginTop: 60 }]}>{t('welcome')}</Text>
-      <TouchableOpacity style={styles.largeButton} onPress={showRandomMessage}>
-        <Text style={styles.buttonText}>{t('showMessage')}</Text>
-      </TouchableOpacity>
-      <Modal isVisible={isModalVisible}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>{randomMessage}</Text>
-          <TouchableOpacity onPress={() => setModalVisible(false)}>
-            <Text style={styles.closeButton}>{t('close')}</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-      {isAuthenticated ? (
-        <View style={styles.buttonContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={[styles.roundButton, styles.bottomButton]}
-              onPress={() => {
-                animateButton();
-                navigation.navigate('Profile');
-              }}
-            >
-              <View style={styles.iconWrapper}>
-                <Icon name="user" size={24} color="#FFF" />
-              </View>
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={[styles.roundButton, styles.topLeftButton]}
+          onPress={() => {
+            animateButton();
+            navigation.navigate('ArchivedMessagesScreen');
+          }}
+        >
+          <View style={styles.iconWrapper}>
+            <Icon name="envelope-open" size={24} color="#FFF" style={styles.icon} />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.roundButton, styles.topRightButton]}
+          onPress={() => {
+            animateButton();
+            navigation.navigate('SettingsScreen');
+          }}
+        >
+          <View style={styles.iconWrapper}>
+            <Icon name="cog" size={24} color="#FFF" style={styles.icon} />
+          </View>
+        </TouchableOpacity>
+        <Text style={[styles.title, { marginTop: 60 }]}>{t('welcome')}</Text>
+        <TouchableOpacity style={styles.largeButton} onPress={confirmOpenCapsule}>
+          <Text style={styles.buttonText}>{t('showMessage')}</Text>
+        </TouchableOpacity>
+        <Modal isVisible={isModalVisible}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>{randomMessage}</Text>
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={styles.closeButton}>{t('close')}</Text>
             </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.rectangleButton}
-              onPress={() => {
-                animateButton();
-                navigation.navigate('Messages');
-              }}
-            >
-              <Text style={styles.buttonText}>{t('sendMessage')}</Text>
+          </View>
+        </Modal>
+        <Modal isVisible={noMessagesModalVisible}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>{t('NoMoreCapsules')}</Text>
+            <TouchableOpacity onPress={() => setNoMessagesModalVisible(false)}>
+              <Text style={styles.closeButton}>{t('close')}</Text>
             </TouchableOpacity>
-          </Animated.View>
-			 <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-			  <TouchableOpacity
-				style={[styles.roundButton, styles.bottomButton]}
-				onPress={() => {
-				  animateButton();
-				  handleLogout();
-				}}
-			  >
-				<View style={styles.iconWrapper}>
-				  <Icon name="sign-out" size={24} color="#FFF" />
-				</View>
-			  </TouchableOpacity>
-			</Animated.View>
-        </View>
-      ) : (
-        <View style={styles.buttonContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.rectangleButton}
-              onPress={() => {
-                animateButton();
-                navigation.navigate('Login');
-              }}
-            >
-              <Text style={styles.buttonText}>{t('login')}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.rectangleButton}
-              onPress={() => {
-                animateButton();
-                navigation.navigate('Register');
-              }}
-            >
-              <Text style={styles.buttonText}>{t('register')}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-      )}
-    </View>
-  </SafeAreaView>
-);
-} 
+          </View>
+        </Modal>
+        <Modal isVisible={confirmModalVisible}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>{t('openCapsulePrompt')}</Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity onPress={() => setConfirmModalVisible(false)} style={styles.modalButtonLeft}>
+                <Text style={styles.closeButton}>{t('cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => { setConfirmModalVisible(false); showRandomMessage(); }} style={styles.modalButtonRight}>
+                <Text style={styles.closeButton}>{t('confirm')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        {isAuthenticated ? (
+          <View style={styles.buttonContainer}>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity
+                style={[styles.roundButton, styles.bottomButton]}
+                onPress={() => {
+                  animateButton();
+                  navigation.navigate('Profile');
+                }}
+              >
+                <View style={styles.iconWrapper}>
+                  <Icon name="user" size={24} color="#FFF" />
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity
+                style={styles.rectangleButton}
+                onPress={() => {
+                  animateButton();
+                  navigation.navigate('Messages');
+                }}
+              >
+                <Text style={styles.buttonText}>{t('sendMessage')}</Text>
+              </TouchableOpacity>
+            </Animated.View>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity
+                style={[styles.roundButton, styles.bottomButton]}
+                onPress={() => {
+                  animateButton();
+                  handleLogout();
+                }}
+              >
+                <View style={styles.iconWrapper}>
+                  <Icon name="sign-out" size={24} color="#FFF" />
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        ) : (
+          <View style={styles.buttonContainer}>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity
+                style={styles.rectangleButton}
+                onPress={() => {
+                  animateButton();
+                  navigation.navigate('Login');
+                }}
+              >
+                <Text style={styles.buttonText}>{t('login')}</Text>
+              </TouchableOpacity>
+            </Animated.View>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity
+                style={styles.rectangleButton}
+                onPress={() => {
+                  animateButton();
+                  navigation.navigate('Register');
+                }}
+              >
+                <Text style={styles.buttonText}>{t('register')}</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        )}
+      </View>
+    </SafeAreaView>
+  );
+}
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -266,10 +293,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
   },
-  iconWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    height: '100%',
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  modalButtonLeft: {
+    marginRight: 20,
+  },
+  modalButtonRight: {
+    marginLeft: 20,
   },
 });
