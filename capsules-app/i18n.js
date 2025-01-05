@@ -91,7 +91,8 @@ const resources = {
       writeMessage: 'Write a message',
       send: 'Send',
 	  language: 'Language',
-	  sounds: 'Sounds'
+	  sounds: 'Sounds',
+	  confirmSend: "Do you confirm sending?"
     }
   },
   it: {
@@ -184,7 +185,8 @@ const resources = {
       writeMessage: 'Scrivi un messaggio',
       send: 'Invia',
 	  language: 'Lingua',
-	  sounds: 'Suoni'	  
+	  sounds: 'Suoni',
+	  confirmSend: "Confermi l'invio?"
     }
   },
   de: {
@@ -277,7 +279,8 @@ const resources = {
       writeMessage: 'Schreibe eine Nachricht',
       send: 'Senden',
 	  language: 'Sprache',
-	  sounds: 'Klänge'	  
+	  sounds: 'Klänge',
+	  confirmSend: "Bestätigen Sie das Senden?"
     }
   },
   es: {
@@ -370,7 +373,8 @@ const resources = {
       writeMessage: 'Escribe un mensaje',
       send: 'Enviar',
 	  language: 'Idioma',
-	  sounds: 'Sonidos'		  
+	  sounds: 'Sonidos',
+	  confirmSend: "¿Confirmas el envío?"
     }
   },
   fr: {
@@ -463,7 +467,8 @@ const resources = {
       writeMessage: 'Écrire un message',
       send: 'Envoyer',
 	  language: 'Langue',
-	  sounds: 'Sons'		  
+	  sounds: 'Sons',
+	  confirmSend: "Confirmez-vous l'envoi?"
     }
   },
   // Aggiungi altre lingue qui

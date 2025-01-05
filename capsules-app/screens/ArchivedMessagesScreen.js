@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, FlatList, Animated } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, FlatList, Animated, Modal } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
@@ -10,6 +10,7 @@ export default function ArchivedMessagesScreen({ navigation }) {
   const { user } = useContext(AuthContext);
   const scaleValue = useState(new Animated.Value(1))[0];
   const [archivedMessages, setArchivedMessages] = useState([]);
+  const [selectedMessage, setSelectedMessage] = useState(null);
 
   useEffect(() => {
     if (user && user.username) {
@@ -33,19 +34,51 @@ export default function ArchivedMessagesScreen({ navigation }) {
     ]).start();
   };
 
+  const closeModal = () => {
+    setSelectedMessage(null);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={[styles.title, { marginTop: 60 }]}>{t('archivedMessages')}</Text>
-        <FlatList
-          data={archivedMessages}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <View style={styles.message}>
-              <Text>{item.sender}: {item.message}</Text>
+        <View style={styles.listContainer}>
+          <FlatList
+            data={archivedMessages}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => setSelectedMessage(item)}>
+                <View style={styles.messageContainer}>
+                  <Text style={styles.sender}>{item.sender}: </Text>
+                  <View style={styles.messageWrapper}>
+                    <Text style={styles.message}>{item.message}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+        {selectedMessage && (
+          <Modal
+            transparent={true}
+            animationType="slide"
+            visible={!!selectedMessage}
+            onRequestClose={closeModal}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={[styles.modalText, styles.modalAlign]}><Text style={styles.modalLabel}>Da:</Text> {selectedMessage.sender}</Text>
+                <Text style={[styles.modalText, styles.modalAlign]}><Text style={styles.modalLabel}>A:</Text> {user.username}</Text>
+                <Text style={[styles.modalText, styles.modalAlign]}><Text style={styles.modalLabel}>Data Invio:</Text> {selectedMessage.timestamp}</Text>
+                <Text style={[styles.modalText, styles.modalAlign]}><Text style={styles.modalLabel}>Data Apertura:</Text> {selectedMessage.archivedAt}</Text>
+                <Text style={[styles.modalText, styles.modalAlign]}><Text style={styles.modalLabel}>Messaggio:</Text> {selectedMessage.message}</Text>
+                <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                  <Text style={styles.closeButtonText}>{t('close')}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          )}
-        />
+          </Modal>
+        )}
         <View style={styles.bottomContainer}>
           <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
             <TouchableOpacity
@@ -70,21 +103,40 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start', // Allinea il contenuto in alto
     alignItems: 'center',
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
+    marginTop: 60, // Assicura che sia sopra gli altri contenuti
   },
-  message: {
+  listContainer: {
+    flex: 1,
+    width: '100%',
+    paddingBottom: 80, // Aggiungi uno spazio inferiore sufficiente
+  },
+  messageContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
+  sender: {
+    fontWeight: 'bold',
+    width: '20%', // Definisce una larghezza fissa per il mittente
+  },
+  messageWrapper: {
+    width: '80%', // Definisce una larghezza fissa per il messaggio
+  },
+  message: {
+    flexShrink: 1,
+    flexWrap: 'wrap',
+  },
   bottomContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-start', // Allinea a sinistra
+    justifyContent: 'flex-start',
     alignItems: 'center',
     width: '100%',
     position: 'absolute',
@@ -103,5 +155,44 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)', // Sfondo semitrasparente
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 10,
+  },
+  modalLabel: {
+    fontWeight: 'bold',
+  },
+  modalAlign: {
+    textAlign: 'left', // Giustifica a sinistra
+    alignSelf: 'stretch', // Assicura che il testo occupi tutta la larghezza
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: '#32CD32',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  closeButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
   },
 });

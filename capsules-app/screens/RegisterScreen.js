@@ -13,7 +13,8 @@ export default function RegisterScreen({ navigation }) {
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post('http://192.168.1.14:3000/register', { username, password, email });
+      const lowercaseUsername = username.toLowerCase(); // Converte lo username in minuscolo
+      const response = await axios.post('http://192.168.1.14:3000/register', { username: lowercaseUsername, password, email });
       if (response.status === 201) {
         navigation.navigate('Login');
       } else {
@@ -44,6 +45,7 @@ export default function RegisterScreen({ navigation }) {
           placeholder={t('usernamePlaceholder')} 
           value={username} 
           onChangeText={setUsername} 
+          maxLength={15} // Limite di 15 caratteri
         />
         <TextInput 
           style={styles.input} 
@@ -66,18 +68,18 @@ export default function RegisterScreen({ navigation }) {
             <Text style={styles.buttonText}>{t('register')}</Text>
           </TouchableOpacity>
         </Animated.View>
-		 <View style={styles.bottomContainer}>
-			<TouchableOpacity
-			 style={styles.backButton}
-			 onPress={() => navigation.goBack()}
-			>
-				<Text style={styles.iconWrapper}>
-					<Text>
-					  <Icon name="arrow-left" size={24} color="#FFF" />
-					</Text>
-				</Text>
-			</TouchableOpacity>
-		 </View>
+        <View style={styles.bottomContainer}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.iconWrapper}>
+              <Text>
+                <Icon name="arrow-left" size={24} color="#FFF" />
+              </Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );

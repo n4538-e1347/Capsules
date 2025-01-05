@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, TextInput, StyleSheet, SafeAreaView, TouchableOpacity, Animated, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import DropDownPicker from 'react-native-dropdown-picker'; // Importa DropDownPicker
@@ -31,6 +31,9 @@ export default function MessageScreen({ navigation }) {
   };
 
   const sendMessage = async () => {
+    if (!selectedFriend || !newMessage.trim()) {
+      return; // Se non è selezionato un destinatario o non c'è un messaggio, non fare nulla
+    }
     try {
       const response = await axios.post('http://192.168.1.14:3000/sendMessage', {
         sender: user.username,
@@ -46,6 +49,24 @@ export default function MessageScreen({ navigation }) {
       alert(`${t('sendMessageError')}: ${error.message}`);
     }
   };
+
+const confirmSendMessage = () => {
+  // Verifica che ci sia un destinatario selezionato e un messaggio non vuoto
+  if (selectedFriend && newMessage) {
+    const buttons = [
+      { text: t('cancel'), onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+      { text: t('send'), onPress: sendMessage }
+    ];
+
+    Alert.alert(
+      t('confirmSend'),
+      '',  // Messaggio di conferma vuoto
+      buttons,
+      { cancelable: false }
+    );
+  }
+};
+
 
   const animateButton = () => {
     Animated.sequence([
@@ -81,20 +102,20 @@ export default function MessageScreen({ navigation }) {
           />
         </View>
         <View style={styles.bottomContainer}>
-			<TouchableOpacity
-			 style={styles.backButton}
-			 onPress={() => navigation.goBack()}
-			>
-				<Text style={styles.iconWrapper}>
-					<Text>
-					  <Icon name="arrow-left" size={24} color="#FFF" />
-					</Text>
-				</Text>
-			</TouchableOpacity>
+            <TouchableOpacity
+             style={styles.backButton}
+             onPress={() => navigation.goBack()}
+            >
+                <Text style={styles.iconWrapper}>
+                    <Text>
+                      <Icon name="arrow-left" size={24} color="#FFF" />
+                    </Text>
+                </Text>
+            </TouchableOpacity>
           <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
             <TouchableOpacity
               style={styles.sendButton}
-              onPress={() => { animateButton(); sendMessage(); }}
+              onPress={() => { animateButton(); confirmSendMessage(); }}
             >
               <Text style={styles.buttonText}>{t('send')}</Text>
             </TouchableOpacity>

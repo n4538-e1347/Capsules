@@ -71,7 +71,8 @@ const messageSchema = new mongoose.Schema({
     receiver: String,
     message: String,
     timestamp: { type: Date, default: Date.now },
-    archived: { type: Boolean, default: false } // Aggiungi il campo archived
+    archived: { type: Boolean, default: false }, 
+	archivedAt: { type: Date }
 });
 const Message = mongoose.model('Message', messageSchema);
 
@@ -99,7 +100,7 @@ app.post('/register', async (req, res) => {
     let { username, password, email } = req.body;
     
     // Pulire le stringhe
-    username = trimString(username);
+    username = trimString(username).toLowerCase(); // Converti in minuscolo
     password = trimString(password);
     email = trimString(email);
 
@@ -127,7 +128,7 @@ app.post('/login', async (req, res) => {
     let { username, password } = req.body;
 
     // Pulire le stringhe
-    username = trimString(username);
+    username = trimString(username).toLowerCase(); // Converti in minuscolo
     password = trimString(password);
 
     try {
@@ -246,7 +247,12 @@ app.post('/sendMessage', async (req, res) => {
 
 // API per Inviare Richieste di Amicizia
 app.post('/sendFriendRequest', async (req, res) => {
-    const { username, friendUsername, message } = req.body;
+    let { username, friendUsername, message } = req.body;
+
+    // Convertire gli username in minuscolo
+    username = trimString(username).toLowerCase();
+    friendUsername = trimString(friendUsername).toLowerCase();
+
     if (username === friendUsername) {
         return res.status(400).send(req.t('selfFriendRequest'));
     }
@@ -292,6 +298,7 @@ app.post('/sendFriendRequest', async (req, res) => {
         res.status(500).send(req.t('sendFriendRequestError'));
     }
 });
+
 // API per Confermare Richieste di Amicizia
 app.post('/confirmFriendRequest', async (req, res) => {
     const { username, friendUsername } = req.body;
@@ -573,7 +580,7 @@ app.post('/deleteAccount', async (req, res) => {
 app.post('/archiveMessage', async (req, res) => {
     const { messageId } = req.body;
     try {
-        await Message.findByIdAndUpdate(messageId, { archived: true });
+        await Message.findByIdAndUpdate(messageId, { archived: true, archivedAt: Date.now() });
         res.status(200).send('Message archived');
     } catch (error) {
         res.status(500).send('Error archiving message');

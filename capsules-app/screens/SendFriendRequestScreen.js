@@ -9,7 +9,6 @@ export default function SendFriendRequestScreen({ navigation }) {
   const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
   const [friendUsername, setFriendUsername] = useState('');
   const [message, setMessage] = useState('');
-//  const { user } = useContext(AuthContext);
   const { user, isAuthenticated, logout } = useContext(AuthContext);
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -33,7 +32,7 @@ export default function SendFriendRequestScreen({ navigation }) {
       return;
     }
 
-    const trimmedFriendUsername = friendUsername.trim(); // Trimma gli spazi dall'username dell'amico
+    const trimmedFriendUsername = friendUsername.trim().toLowerCase(); // Trimma gli spazi e converte in minuscolo
 
     if (message.length > 100) {
       setConfirmationMessage(t('messageTooLong'));
@@ -106,18 +105,18 @@ export default function SendFriendRequestScreen({ navigation }) {
             </View>
           </View>
         </Modal>
-		 <View style={styles.bottomContainer}>
-			<TouchableOpacity
-			 style={styles.backButton}
-			 onPress={() => navigation.goBack()}
-			>
-				<Text style={styles.iconWrapper}>
-					<Text>
-					  <Icon name="arrow-left" size={24} color="#FFF" />
-					</Text>
-				</Text>
-			</TouchableOpacity>
-		 </View>
+        <View style={styles.bottomContainer}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.iconWrapper}>
+              <Text>
+                <Icon name="arrow-left" size={24} color="#FFF" />
+              </Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
