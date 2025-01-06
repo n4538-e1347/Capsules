@@ -10,6 +10,7 @@ export default function HomeScreen({ navigation }) {
   const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useContext(AuthContext);
   const scaleValue = useState(new Animated.Value(1))[0];
+  const scaleModalValue = useState(new Animated.Value(0))[0];
   const [messages, setMessages] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [randomMessage, setRandomMessage] = useState('');
@@ -58,6 +59,7 @@ export default function HomeScreen({ navigation }) {
     setRandomMessage(selectedMessage.message);
     setModalVisible(true);
     archiveMessage(selectedMessage._id);
+    Animated.timing(scaleModalValue, { toValue: 1, duration: 500, useNativeDriver: true }).start();
   };
 
   const confirmOpenCapsule = () => {
@@ -66,6 +68,11 @@ export default function HomeScreen({ navigation }) {
     } else {
       setConfirmModalVisible(true);
     }
+  };
+
+  const handleConfirmClose = () => {
+    setConfirmModalVisible(false);
+    scaleModalValue.setValue(0); // Reset della scala per l'animazione del messaggio
   };
 
   return (
@@ -97,13 +104,13 @@ export default function HomeScreen({ navigation }) {
         <TouchableOpacity style={styles.largeButton} onPress={confirmOpenCapsule}>
           <Text style={styles.buttonText}>{t('showMessage')}</Text>
         </TouchableOpacity>
-        <Modal isVisible={isModalVisible}>
-          <View style={styles.modalContent}>
+        <Modal isVisible={isModalVisible} onModalShow={() => Animated.timing(scaleModalValue, { toValue: 1, duration: 500, useNativeDriver: true }).start()}>
+          <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleModalValue }] }]}>
             <Text style={styles.modalText}>{randomMessage}</Text>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={styles.closeButton}>{t('close')}</Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </Modal>
         <Modal isVisible={noMessagesModalVisible}>
           <View style={styles.modalContent}>
@@ -117,10 +124,10 @@ export default function HomeScreen({ navigation }) {
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>{t('openCapsulePrompt')}</Text>
             <View style={styles.modalButtonContainer}>
-              <TouchableOpacity onPress={() => setConfirmModalVisible(false)} style={styles.modalButtonLeft}>
+              <TouchableOpacity onPress={handleConfirmClose} style={styles.modalButtonLeft}>
                 <Text style={styles.closeButton}>{t('cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => { setConfirmModalVisible(false); showRandomMessage(); }} style={styles.modalButtonRight}>
+              <TouchableOpacity onPress={() => { handleConfirmClose(); showRandomMessage(); }} style={styles.modalButtonRight}>
                 <Text style={styles.closeButton}>{t('confirm')}</Text>
               </TouchableOpacity>
             </View>
