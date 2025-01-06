@@ -328,11 +328,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10,
   },
-  modalTextItalic: {
-    fontSize: 18,
-    marginBottom: 10,
-    fontStyle: 'italic', // Imposta il testo in corsivo
-  },
+modalTextItalic: {
+  fontSize: 18,
+  marginBottom: 10,
+  fontFamily: 'IndieFlower-Regular', // Use the font family for the handwriting effect
+  fontStyle: 'italic', // Optional: use to make the text italic
+},
   closeButton: {
     fontSize: 18,
     color: '#32CD32',
