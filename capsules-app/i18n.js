@@ -92,16 +92,63 @@ const resources = {
       send: 'Send',
 	  language: 'Language',
 	  sounds: 'Sounds',
-	  confirmSend: "Do you confirm sending?",
-	  username: "Username",
-	  email: "Email",
-	  hideEmail: "Hide Email",
-	  showEmail: "Show Email",
-	  premiumStatus: "Premium User",
-	  NoMoreCapsules: "You have no more capsules!",
-	  openCapsulePrompt: "Do you wish to open a capsule?",
-	  removeFriendMessage: "Do you want to remove this contact?",
-	  blockFriendMessage: "Do you want to block this contact?"	  
+	  confirmSend: 'Do you confirm sending?',
+	  username: 'Username',
+	  email: 'Email',
+	  hideEmail: 'Hide Email',
+	  showEmail: 'Show Email',
+	  premiumStatus: 'Premium User',
+	  NoMoreCapsules: 'You have no more capsules!',
+	  openCapsulePrompt: 'Do you wish to open a capsule?',
+	  removeFriendMessage: 'Do you want to remove this contact?',
+	  blockFriendMessage: 'Do you want to block this contact?',
+	  helpCenter: 'Help Center',
+	  notifications: 'Notifications',
+	  contactUs: 'Contact Us',
+	  termsPrivacy: 'Terms and Privacy',
+	  appInfo: 'App info',
+      termsAndConditions: `
+		**Last updated: January 2025**
+
+		**Acceptance of Terms**
+		By using the **Capsules** app, the user agrees to abide by these Terms and Conditions. If you do not agree with these terms, please do not use the app.
+
+		**Use of the Application**
+		The app is intended for personal use only. The user agrees not to use the app for illegal or unauthorized purposes. The user also agrees not to interfere with the normal operation of the app.
+
+		**Intellectual Property**
+		All content within the app, including text, images, logos, and trademarks, is the property of **Capsules** or its licensors. Copying, modifying, distributing, or creating derivative works from the content without written consent from **Capsules** is prohibited.
+
+		**Limitation of Liability**
+		The app is provided "as is" and "as available." We do not guarantee that the app will be error-free or uninterrupted. **Capsules** will not be liable for any damages arising from the use of the app.
+
+		**Changes to Terms**
+		We reserve the right to modify these Terms at any time. Changes will be posted within the app, and continued use of the app constitutes acceptance of the new Terms.
+			`,
+	  privacyPolicy: `
+		**Last updated: January 2025**
+
+		**Introduction**
+		This Privacy Policy describes how we collect, use, and protect the personal data of users of the **Capsules** app.
+
+		**Data Collection**
+		We collect personal data provided voluntarily by the user, such as name and email address, during registration. Additionally, we collect data related to the use of the app, such as preferences and settings.
+
+		**Data Use**
+		We use the collected data to provide and improve the services offered by the app, to communicate with the user, and to ensure the security of the app.
+
+		**Data Sharing**
+		We do not share users' personal data with third parties, except where required by law or with the user's explicit consent.
+
+		**Data Security**
+		We implement technical and organizational security measures to protect users' personal data from unauthorized access, loss, or destruction.
+
+		**User Rights**
+		Users have the right to access, correct, and delete their personal data. To exercise these rights, please contact us at the email address provided within the app.
+
+		**Changes to Privacy Policy**
+		We reserve the right to modify this Privacy Policy at any time. Changes will be posted within the app, and continued use of the app constitutes acceptance of the new Privacy Policy.
+			`  
     }
   },
   it: {
@@ -195,16 +242,63 @@ const resources = {
       send: 'Invia',
 	  language: 'Lingua',
 	  sounds: 'Suoni',
-	  confirmSend: "Confermi l'invio?",
-	  username: "Username",
-	  email: "e-mail",
-	  hideEmail: "Nascondi e-mail",
-	  showEmail: "Mostra e-mail",
-	  premiumStatus: "Utente Premium",
-	  NoMoreCapsules: "Hai finito le capsule!",
-	  openCapsulePrompt: "Vuoi aprire una capsula?",
-	  removeFriendMessage: "Vuoi rimuovere il contatto?",
-	  blockFriendMessage: "Vuoi bloccare il contatto?"
+	  confirmSend: 'Confermi l\'invio?',
+	  username: 'Username',
+	  email: 'e-mail',
+	  hideEmail: 'Nascondi e-mail',
+	  showEmail: 'Mostra e-mail',
+	  premiumStatus: 'Utente Premium',
+	  NoMoreCapsules: 'Hai finito le capsule!',
+	  openCapsulePrompt: 'Vuoi aprire una capsula?',
+	  removeFriendMessage: 'Vuoi rimuovere il contatto?',
+	  blockFriendMessage: 'Vuoi bloccare il contatto?',
+	  helpCenter: 'Centro Assistenza',
+	  notifications: 'Notifiche',
+	  contactUs: 'Contattaci',
+	  termsPrivacy: 'Termini e Privacy',
+	  appInfo: 'App info',
+	  termsAndConditions: `
+		**Ultimo aggiornamento: Gennaio 2025**
+
+		**Accettazione dei Termini**
+		Utilizzando l'applicazione **Capsules**, l'utente accetta di rispettare i presenti Termini e Condizioni. Se non si accettano questi termini, si prega di non utilizzare l'app.
+
+		**Uso dell'Applicazione**
+		L'app è destinata esclusivamente all'uso personale. L'utente si impegna a non utilizzare l'app per scopi illegali o non autorizzati. L'utente si impegna inoltre a non interferire con il normale funzionamento dell'app.
+
+		**Proprietà Intellettuale**
+		Tutti i contenuti presenti nell'app, inclusi testi, immagini, loghi e marchi, sono di proprietà di **Capsules** o dei suoi licenziatari. È vietato copiare, modificare, distribuire o creare opere derivate dai contenuti senza il consenso scritto di **Capsules**.
+
+		**Limitazione di Responsabilità**
+		L'app è fornita "così com'è" e "come disponibile". Non garantiamo che l'app sarà priva di errori o interruzioni. **Capsules** non sarà responsabile per eventuali danni derivanti dall'uso dell'app.
+
+		**Modifiche ai Termini**
+		Ci riserviamo il diritto di modificare questi Termini in qualsiasi momento. Le modifiche saranno pubblicate all'interno dell'app e l'uso continuato dell'app costituisce l'accettazione dei nuovi Termini.
+			`,
+	  privacyPolicy: `
+		**Ultimo aggiornamento: Gennaio 2025**
+
+		**Introduzione**
+		La presente Informativa sulla Privacy descrive come raccogliamo, utilizziamo e proteggiamo i dati personali degli utenti dell'app **Capsules**.
+
+		**Raccolta dei Dati**
+		Raccogliamo dati personali forniti volontariamente dall'utente, come nome e indirizzo email, al momento della registrazione. Inoltre, raccogliamo dati relativi all'uso dell'app, come le preferenze e le impostazioni.
+
+		**Utilizzo dei Dati**
+		Utilizziamo i dati raccolti per fornire e migliorare i servizi offerti dall'app, per comunicare con l'utente e per garantire la sicurezza dell'app.
+
+		**Condivisione dei Dati**
+		Non condividiamo i dati personali degli utenti con terze parti, salvo ove richiesto dalla legge o con il consenso esplicito dell'utente.
+
+		**Sicurezza dei Dati**
+		Adottiamo misure di sicurezza tecniche e organizzative per proteggere i dati personali degli utenti da accessi non autorizzati, perdita o distruzione.
+
+		**Diritti degli Utenti**
+		Gli utenti hanno il diritto di accedere, correggere e cancellare i propri dati personali. Per esercitare questi diritti, contattaci all'indirizzo email fornito nell'app.
+
+		**Modifiche alla Privacy**
+		Ci riserviamo il diritto di modificare questa Informativa sulla Privacy in qualsiasi momento. Le modifiche saranno pubblicate all'interno dell'app e l'uso continuato dell'app costituisce l'accettazione della nuova Informativa sulla Privacy.
+			`
     }
   },
   de: {
@@ -298,16 +392,63 @@ const resources = {
       send: 'Senden',
 	  language: 'Sprache',
 	  sounds: 'Klänge',
-	  confirmSend: "Bestätigen Sie das Senden?",
-	  username: "Benutzername",
-	  email: "E-Mail",
-	  hideEmail: "E-Mail verbergen",
-	  showEmail: "E-Mail anzeigen",
-	  premiumStatus: "Premium-Benutzer",
-	  NoMoreCapsules: "Du hast keine Kapseln mehr!",
-	  openCapsulePrompt: "Möchtest du eine Kapsel öffnen?",
-	  removeFriendMessage: "Möchtest du diesen Kontakt entfernen?",
-	  blockFriendMessage: "Möchtest du diesen Kontakt blockieren?"	  
+	  confirmSend: 'Bestätigen Sie das Senden?',
+	  username: 'Benutzername',
+	  email: 'E-Mail',
+	  hideEmail: 'E-Mail verbergen',
+	  showEmail: 'E-Mail anzeigen',
+	  premiumStatus: 'Premium-Benutzer',
+	  NoMoreCapsules: 'Du hast keine Kapseln mehr!',
+	  openCapsulePrompt: 'Möchtest du eine Kapsel öffnen?',
+	  removeFriendMessage: 'Möchtest du diesen Kontakt entfernen?',
+	  blockFriendMessage: 'Möchtest du diesen Kontakt blockieren?',
+	  helpCenter: 'Hilfezentrum',
+	  notifications: 'Benachrichtigungen',
+	  contactUs: 'Kontaktieren Sie uns',
+	  termsPrivacy: 'AGB und Datenschutz',
+	  appInfo: 'App-Info',
+      termsAndConditions: `
+		**Letzte Aktualisierung: Januar 2025**
+
+		**Akzeptanz der Bedingungen**
+		Durch die Nutzung der Anwendung **Capsules** erklärt sich der Benutzer mit diesen Bedingungen einverstanden. Wenn Sie diese Bedingungen nicht akzeptieren, verwenden Sie die App bitte nicht.
+
+		**Verwendung der Anwendung**
+		Die App ist nur für den persönlichen Gebrauch bestimmt. Der Benutzer verpflichtet sich, die App nicht für illegale oder nicht autorisierte Zwecke zu verwenden. Der Benutzer verpflichtet sich außerdem, den normalen Betrieb der App nicht zu stören.
+
+		**Geistiges Eigentum**
+		Alle Inhalte der App, einschließlich Texte, Bilder, Logos und Marken, sind Eigentum von **Capsules** oder deren Lizenzgebern. Es ist verboten, die Inhalte ohne schriftliche Genehmigung von **Capsules** zu kopieren, zu ändern, zu verteilen oder abgeleitete Werke zu erstellen.
+
+		**Haftungsbeschränkung**
+		Die App wird "wie besehen" und "wie verfügbar" bereitgestellt. Wir garantieren nicht, dass die App fehlerfrei oder unterbrechungsfrei ist. **Capsules** haftet nicht für Schäden, die sich aus der Nutzung der App ergeben.
+
+		**Änderungen der Bedingungen**
+		Wir behalten uns das Recht vor, diese Bedingungen jederzeit zu ändern. Änderungen werden in der App veröffentlicht und die fortgesetzte Nutzung der App stellt die Annahme der neuen Bedingungen dar.
+			`,
+	  privacyPolicy: `
+		**Letzte Aktualisierung: Januar 2025**
+
+		**Einführung**
+		Diese Datenschutzrichtlinie beschreibt, wie wir die personenbezogenen Daten der Benutzer der App **Capsules** erfassen, verwenden und schützen.
+
+		**Datenerfassung**
+		Wir erfassen personenbezogene Daten, die der Benutzer freiwillig bei der Registrierung angibt, wie Name und E-Mail-Adresse. Außerdem erfassen wir Daten über die Nutzung der App, wie Präferenzen und Einstellungen.
+
+		**Datenverwendung**
+		Wir verwenden die erfassten Daten, um die angebotenen Dienste der App bereitzustellen und zu verbessern, mit dem Benutzer zu kommunizieren und die Sicherheit der App zu gewährleisten.
+
+		**Datenweitergabe**
+		Wir geben die personenbezogenen Daten der Benutzer nicht an Dritte weiter, es sei denn, dies ist gesetzlich vorgeschrieben oder mit ausdrücklicher Zustimmung des Benutzers.
+
+		**Datensicherheit**
+		Wir ergreifen technische und organisatorische Maßnahmen, um die personenbezogenen Daten der Benutzer vor unbefugtem Zugriff, Verlust oder Zerstörung zu schützen.
+
+		**Rechte der Benutzer**
+		Benutzer haben das Recht, auf ihre personenbezogenen Daten zuzugreifen, diese zu korrigieren und zu löschen. Um diese Rechte auszuüben, kontaktieren Sie uns bitte unter der in der App angegebenen E-Mail-Adresse.
+
+		**Änderungen der Datenschutzrichtlinie**
+		Wir behalten uns das Recht vor, diese Datenschutzrichtlinie jederzeit zu ändern. Änderungen werden in der App veröffentlicht und die fortgesetzte Nutzung der App stellt die Annahme der neuen Datenschutzrichtlinie dar.
+			`	  
     }
   },
   es: {
@@ -401,16 +542,63 @@ const resources = {
       send: 'Enviar',
 	  language: 'Idioma',
 	  sounds: 'Sonidos',
-	  confirmSend: "¿Confirmas el envío?",
-	  username: "Nombre de usuario",
-	  email: "Correo electrónico",
-	  hideEmail: "Ocultar correo electrónico",
-	  showEmail: "Mostrar correo electrónico",
-	  premiumStatus: "Usuario Premium",
-	  NoMoreCapsules: "¡No tienes más cápsulas!",
-	  openCapsulePrompt: "¿Quieres abrir una cápsula?",
-	  removeFriendMessage: "¿Quieres eliminar este contacto?",
-	  blockFriendMessage: "¿Quieres bloquear este contacto?"	  
+	  confirmSend: '¿Confirmas el envío?',
+	  username: 'Nombre de usuario',
+	  email: 'Correo electrónico',
+	  hideEmail: 'Ocultar correo electrónico',
+	  showEmail: 'Mostrar correo electrónico',
+	  premiumStatus: 'Usuario Premium',
+	  NoMoreCapsules: '¡No tienes más cápsulas!',
+	  openCapsulePrompt: '¿Quieres abrir una cápsula?',
+	  removeFriendMessage: '¿Quieres eliminar este contacto?',
+	  blockFriendMessage: '¿Quieres bloquear este contacto?',
+	  helpCenter: 'Centro de ayuda',
+	  notifications: 'Notificaciones',
+	  contactUs: 'Contáctenos',
+	  termsPrivacy: 'Términos y privacidad',
+	  appInfo: 'Información de la app',
+	  termsAndConditions: `
+		**Última actualización: Enero 2025**
+
+		**Aceptación de los Términos**
+		Al utilizar la aplicación **Capsules**, el usuario acepta cumplir con estos Términos y Condiciones. Si no acepta estos términos, no utilice la aplicación.
+
+		**Uso de la Aplicación**
+		La aplicación está destinada únicamente para uso personal. El usuario se compromete a no utilizar la aplicación para fines ilegales o no autorizados. El usuario también se compromete a no interferir con el funcionamiento normal de la aplicación.
+
+		**Propiedad Intelectual**
+		Todos los contenidos presentes en la aplicación, incluidos textos, imágenes, logotipos y marcas, son propiedad de **Capsules** o de sus licenciantes. Está prohibido copiar, modificar, distribuir o crear obras derivadas de los contenidos sin el consentimiento escrito de **Capsules**.
+
+		**Limitación de Responsabilidad**
+		La aplicación se proporciona "tal como está" y "según disponibilidad". No garantizamos que la aplicación esté libre de errores o interrupciones. **Capsules** no será responsable de ningún daño derivado del uso de la aplicación.
+
+		**Cambios en los Términos**
+		Nos reservamos el derecho de modificar estos Términos en cualquier momento. Los cambios se publicarán dentro de la aplicación y el uso continuado de la aplicación constituye la aceptación de los nuevos Términos.
+			`,
+	  privacyPolicy: `
+		**Última actualización: Enero 2025**
+
+		**Introducción**
+		Esta Política de Privacidad describe cómo recopilamos, usamos y protegemos los datos personales de los usuarios de la aplicación **Capsules**.
+
+		**Recopilación de Datos**
+		Recopilamos datos personales proporcionados voluntariamente por el usuario, como nombre y dirección de correo electrónico, al momento del registro. Además, recopilamos datos relacionados con el uso de la aplicación, como las preferencias y configuraciones.
+
+		**Uso de los Datos**
+		Utilizamos los datos recopilados para proporcionar y mejorar los servicios ofrecidos por la aplicación, para comunicarnos con el usuario y para garantizar la seguridad de la aplicación.
+
+		**Compartir Datos**
+		No compartimos los datos personales de los usuarios con terceros, salvo cuando sea requerido por la ley o con el consentimiento explícito del usuario.
+
+		**Seguridad de los Datos**
+		Adoptamos medidas de seguridad técnicas y organizativas para proteger los datos personales de los usuarios contra accesos no autorizados, pérdida o destrucción.
+
+		**Derechos de los Usuarios**
+		Los usuarios tienen el derecho de acceder, corregir y eliminar sus datos personales. Para ejercer estos derechos, contáctenos en la dirección de correo electrónico proporcionada en la aplicación.
+
+		**Cambios en la Política de Privacidad**
+		Nos reservamos el derecho de modificar esta Política de Privacidad en cualquier momento. Los cambios se publicarán dentro de la aplicación y el uso continuado de la aplicación constituye la aceptación de la nueva Política de Privacidad.
+			`	  
     }
   },
   fr: {
@@ -504,16 +692,63 @@ const resources = {
       send: 'Envoyer',
 	  language: 'Langue',
 	  sounds: 'Sons',
-	  confirmSend: "Confirmez-vous l'envoi?",
-	  username: "Nom d'utilisateur",
-	  email: "Email",
-	  hideEmail: "Masquer l'email",
-	  showEmail: "Afficher l'email",
-	  premiumStatus: "Utilisateur Premium",
-	  NoMoreCapsules: "Vous n'avez plus de capsules!",
-	  openCapsulePrompt: "Voulez-vous ouvrir une capsule?",
-	  removeFriendMessage: "Voulez-vous supprimer ce contact?",
-	  blockFriendMessage: "Voulez-vous bloquer ce contact?"	  
+	  confirmSend: 'Confirmez-vous l\'envoi?',
+	  username: 'Nom d\'utilisateur',
+	  email: 'Email',
+	  hideEmail: 'Masquer l\'email',
+	  showEmail: 'Afficher l\'email',
+	  premiumStatus: 'Utilisateur Premium',
+	  NoMoreCapsules: 'Vous n\'avez plus de capsules!',
+	  openCapsulePrompt: 'Voulez-vous ouvrir une capsule?',
+	  removeFriendMessage: 'Voulez-vous supprimer ce contact?',
+	  blockFriendMessage: 'Voulez-vous bloquer ce contact?',
+	  helpCenter: 'Centre d\'aide',
+	  notifications: 'Notifications',
+	  contactUs: 'Contactez-nous',
+	  termsPrivacy: 'Termes et confidentialité',
+	  appInfo: 'Infos sur l\'app',
+      termsAndConditions: `
+		**Dernière mise à jour : Janvier 2025**
+
+		**Acceptation des Termes**
+		En utilisant l'application **Capsules**, l'utilisateur accepte de respecter les présents Termes et Conditions. Si vous n'acceptez pas ces termes, veuillez ne pas utiliser l'application.
+
+		**Utilisation de l'Application**
+		L'application est destinée à un usage personnel uniquement. L'utilisateur s'engage à ne pas utiliser l'application à des fins illégales ou non autorisées. L'utilisateur s'engage également à ne pas interférer avec le fonctionnement normal de l'application.
+
+		**Propriété Intellectuelle**
+		Tous les contenus présents dans l'application, y compris les textes, images, logos et marques, sont la propriété de **Capsules** ou de ses licenciés. Il est interdit de copier, modifier, distribuer ou créer des œuvres dérivées des contenus sans le consentement écrit de **Capsules**.
+
+		**Limitation de Responsabilité**
+		L'application est fournie "en l'état" et "selon disponibilité". Nous ne garantissons pas que l'application sera exempte d'erreurs ou d'interruptions. **Capsules** ne sera pas responsable des dommages résultant de l'utilisation de l'application.
+
+		**Modifications des Termes**
+		Nous nous réservons le droit de modifier ces Termes à tout moment. Les modifications seront publiées dans l'application et l'utilisation continue de l'application constitue l'acceptation des nouveaux Termes.
+			`,
+	  privacyPolicy: `
+		**Dernière mise à jour : Janvier 2025**
+
+		**Introduction**
+		La présente Politique de Confidentialité décrit comment nous collectons, utilisons et protégeons les données personnelles des utilisateurs de l'application **Capsules**.
+
+		**Collecte des Données**
+		Nous collectons des données personnelles fournies volontairement par l'utilisateur, telles que le nom et l'adresse e-mail, lors de l'inscription. En outre, nous collectons des données relatives à l'utilisation de l'application, telles que les préférences et les paramètres.
+
+		**Utilisation des Données**
+		Nous utilisons les données collectées pour fournir et améliorer les services offerts par l'application, pour communiquer avec l'utilisateur et pour garantir la sécurité de l'application.
+
+		**Partage des Données**
+		Nous ne partageons pas les données personnelles des utilisateurs avec des tiers, sauf lorsque cela est requis par la loi ou avec le consentement explicite de l'utilisateur.
+
+		**Sécurité des Données**
+		Nous adoptons des mesures de sécurité techniques et organisationnelles pour protéger les données personnelles des utilisateurs contre tout accès non autorisé, perte ou destruction.
+
+		**Droits des Utilisateurs**
+		Les utilisateurs ont le droit d'accéder à leurs données personnelles, de les corriger et de les supprimer. Pour exercer ces droits, veuillez nous contacter à l'adresse e-mail fournie dans l'application.
+
+		**Modifications de la Politique de Confidentialité**
+		Nous nous réservons le droit de modifier cette Politique de Confidentialité à tout moment. Les modifications seront publiées dans l'application et l'utilisation continue de l'application constitue l'acceptation de la nouvelle Politique de Confidentialité.
+			`	  
     }
   },
   // Aggiungi altre lingue qui

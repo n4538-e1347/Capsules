@@ -4,13 +4,11 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
 
 export default function SettingsScreen({ navigation }) {
-  const { t } = useTranslation(); // Utilizza il hook useTranslation correttamente
-  const [soundsEnabled, setSoundsEnabled] = useState(true); // Stato per i suoni
+  const { t } = useTranslation();
+  const [soundsEnabled, setSoundsEnabled] = useState(true);
 
-  // Funzione per attivare/disattivare i suoni
   const toggleSounds = () => {
     setSoundsEnabled(!soundsEnabled);
-    // Aggiungi qui la logica per attivare o disattivare i suoni dell'app
     console.log(`I suoni sono ora ${soundsEnabled ? 'disattivati' : 'attivati'}`);
   };
 
@@ -29,6 +27,18 @@ export default function SettingsScreen({ navigation }) {
           onPress={toggleSounds}
         >
           <Text style={styles.buttonText}>{soundsEnabled ? t('sounds') + ' On' : t('sounds') + ' Off'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('NotificationsScreen')}
+        >
+          <Text style={styles.buttonText}>{t('notifications')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('HelpScreen')}
+        >
+          <Text style={styles.buttonText}>{t('helpCenter')}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.bottomContainer}>
