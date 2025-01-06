@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, Image } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
@@ -121,8 +121,12 @@ return (
         </View>
       </TouchableOpacity>
       <Text style={[styles.title, { marginTop: 60 }]}>{t('welcome')}</Text>
-      <TouchableOpacity style={styles.largeButton} onPress={confirmOpenCapsule}>
-        <Text style={styles.buttonText}>{t('showMessage')}</Text>
+      <TouchableOpacity onPress={confirmOpenCapsule}>
+        <Image 
+          source={require('../assets/images/button_image.jpg')} 
+          style={styles.largeButton} 
+          resizeMode="cover"
+        />
       </TouchableOpacity>
       <LottieView
         ref={animation}
@@ -263,10 +267,6 @@ const styles = StyleSheet.create({
   largeButton: {
     width: 280,
     height: 450,
-    backgroundColor: '#32CD32',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
     borderRadius: 10,
   },
   buttonContainer: {
