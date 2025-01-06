@@ -1,10 +1,11 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import Modal from 'react-native-modal';
 import { useTranslation } from 'react-i18next';
+import LottieView from 'lottie-react-native';
 
 export default function HomeScreen({ navigation }) {
   const { t } = useTranslation();
@@ -16,6 +17,7 @@ export default function HomeScreen({ navigation }) {
   const [randomMessage, setRandomMessage] = useState('');
   const [noMessagesModalVisible, setNoMessagesModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const animation = useRef(null);
 
   useEffect(() => {
     if (user && user.username) {
@@ -57,9 +59,12 @@ export default function HomeScreen({ navigation }) {
     const randomIndex = Math.floor(Math.random() * messages.length);
     const selectedMessage = messages[randomIndex];
     setRandomMessage(selectedMessage.message);
-    setModalVisible(true);
     archiveMessage(selectedMessage._id);
-    Animated.timing(scaleModalValue, { toValue: 1, duration: 500, useNativeDriver: true }).start();
+    animation.current.play();
+    setTimeout(() => {
+      setModalVisible(true);
+      Animated.timing(scaleModalValue, { toValue: 1, duration: 500, useNativeDriver: true }).start();
+    }, 3000); 
   };
 
   const confirmOpenCapsule = () => {
@@ -104,7 +109,14 @@ export default function HomeScreen({ navigation }) {
         <TouchableOpacity style={styles.largeButton} onPress={confirmOpenCapsule}>
           <Text style={styles.buttonText}>{t('showMessage')}</Text>
         </TouchableOpacity>
-        <Modal isVisible={isModalVisible} onModalShow={() => Animated.timing(scaleModalValue, { toValue: 1, duration: 500, useNativeDriver: true }).start()}>
+        <LottieView
+          ref={animation}
+          source={require('../assets/animations/confetti.json')} // Assicurati che il percorso sia corretto
+          autoPlay={false}
+          loop={false}
+          style={styles.lottie}
+        />
+        <Modal isVisible={isModalVisible} onModalShow={() => Animated.timing(scaleModalValue, { toValue: 1, duration: 5000, useNativeDriver: true }).start()}>
           <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleModalValue }] }]}>
             <Text style={styles.modalText}>{randomMessage}</Text>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -310,5 +322,15 @@ const styles = StyleSheet.create({
   },
   modalButtonRight: {
     marginLeft: 20,
+  },
+  lottie: {
+    width: 300,
+    height: 300,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -150,
+    marginLeft: -150,
+    zIndex: 1, // Aggiungi questa proprietà per dare priorità all'animazione
   },
 });
