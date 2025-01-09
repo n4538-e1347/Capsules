@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, Image } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, Image, ImageBackground } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
@@ -97,154 +97,163 @@ export default function HomeScreen({ navigation }) {
 
 return (
   <SafeAreaView style={styles.safeArea}>
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={[styles.roundButton, styles.topLeftButton]}
-        onPress={() => {
-          animateButton();
-          navigation.navigate('ArchivedMessagesScreen');
-        }}
-      >
-        <View style={styles.iconWrapper}>
-          <Icon name="envelope-open" size={24} color="#FFF" style={styles.icon} />
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.roundButton, styles.topRightButton]}
-        onPress={() => {
-          animateButton();
-          navigation.navigate('SettingsScreen');
-        }}
-      >
-        <View style={styles.iconWrapper}>
-          <Icon name="cog" size={24} color="#FFF" style={styles.icon} />
-        </View>
-      </TouchableOpacity>
-      <Text style={[styles.title, { marginTop: 60 }]}>{t('welcome')}</Text>
-      <TouchableOpacity onPress={confirmOpenCapsule}>
-        <Image 
-          source={require('../assets/images/button_image.jpg')} 
-          style={styles.largeButton} 
-          resizeMode="cover"
+    <ImageBackground 
+      source={require('../assets/images/background_image.jpg')} 
+      style={styles.backgroundImage}
+    >
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={[styles.roundButton, styles.topLeftButton]}
+          onPress={() => {
+            animateButton();
+            navigation.navigate('ArchivedMessagesScreen');
+          }}
+        >
+          <View style={styles.iconWrapper}>
+            <Icon name="envelope-open" size={24} color="#FFF" style={styles.icon} />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.roundButton, styles.topRightButton]}
+          onPress={() => {
+            animateButton();
+            navigation.navigate('SettingsScreen');
+          }}
+        >
+          <View style={styles.iconWrapper}>
+            <Icon name="cog" size={24} color="#FFF" style={styles.icon} />
+          </View>
+        </TouchableOpacity>
+        <Text style={[styles.title, { marginTop: 60 }]}>{t('welcome')}</Text>
+        <TouchableOpacity onPress={confirmOpenCapsule}>
+          <Image 
+            source={require('../assets/images/button_image.jpg')} 
+            style={styles.largeButton} 
+            resizeMode="cover"
+          />
+        </TouchableOpacity>
+        <LottieView
+          ref={animation}
+          source={require('../assets/animations/confetti.json')} // Assicurati che il percorso sia corretto
+          autoPlay={false}
+          loop={false}
+          style={styles.lottie}
         />
-      </TouchableOpacity>
-      <LottieView
-        ref={animation}
-        source={require('../assets/animations/confetti.json')} // Assicurati che il percorso sia corretto
-        autoPlay={false}
-        loop={false}
-        style={styles.lottie}
-      />
-      {isModalVisible && (
-        <View style={styles.overlay} pointerEvents="auto">
-          <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleModalValue }] }]}>
-            <Text style={styles.modalTextItalic}>{randomMessage}</Text>
-            <TouchableOpacity onPress={handleModalClose}>
-              <Text style={styles.closeButton}>{t('close')}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-      )}
-      {noMessagesModalVisible && (
-        <View style={styles.overlay} pointerEvents="auto">
-          <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleNoMessagesModalValue }] }]}>
-            <Text style={styles.modalText}>{t('NoMoreCapsules')}</Text>
-            <TouchableOpacity onPress={handleNoMessagesClose}>
-              <Text style={styles.closeButton}>{t('close')}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-      )}
-      {confirmModalVisible && (
-        <View style={styles.overlay} pointerEvents="auto">
-          <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleConfirmModalValue }] }]}>
-            <Text style={styles.modalText}>{t('openCapsulePrompt')}</Text>
-            <View style={styles.modalButtonContainer}>
-              <TouchableOpacity onPress={handleConfirmClose} style={styles.modalButtonLeft}>
-                <Text style={styles.closeButton}>{t('cancel')}</Text>
+        {isModalVisible && (
+          <View style={styles.overlay} pointerEvents="auto">
+            <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleModalValue }] }]}>
+              <Text style={styles.modalTextItalic}>{randomMessage}</Text>
+              <TouchableOpacity onPress={handleModalClose}>
+                <Text style={styles.closeButton}>{t('close')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => { handleConfirmClose(); showRandomMessage(); }} style={styles.modalButtonRight}>
-                <Text style={styles.closeButton}>{t('confirm')}</Text>
+            </Animated.View>
+          </View>
+        )}
+        {noMessagesModalVisible && (
+          <View style={styles.overlay} pointerEvents="auto">
+            <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleNoMessagesModalValue }] }]}>
+              <Text style={styles.modalText}>{t('NoMoreCapsules')}</Text>
+              <TouchableOpacity onPress={handleNoMessagesClose}>
+                <Text style={styles.closeButton}>{t('close')}</Text>
               </TouchableOpacity>
-            </View>
-          </Animated.View>
-        </View>
-      )}
-      {isAuthenticated ? (
-        <View style={styles.buttonContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={[styles.roundButton, styles.bottomButton]}
-              onPress={() => {
-                animateButton();
-                navigation.navigate('Profile');
-              }}
-            >
-              <View style={styles.iconWrapper}>
-                <Icon name="user" size={24} color="#FFF" />
+            </Animated.View>
+          </View>
+        )}
+        {confirmModalVisible && (
+          <View style={styles.overlay} pointerEvents="auto">
+            <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleConfirmModalValue }] }]}>
+              <Text style={styles.modalText}>{t('openCapsulePrompt')}</Text>
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity onPress={handleConfirmClose} style={styles.modalButtonLeft}>
+                  <Text style={styles.closeButton}>{t('cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { handleConfirmClose(); showRandomMessage(); }} style={styles.modalButtonRight}>
+                  <Text style={styles.closeButton}>{t('confirm')}</Text>
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.rectangleButton}
-              onPress={() => {
-                animateButton();
-                navigation.navigate('Messages');
-              }}
-            >
-              <Text style={styles.buttonText}>{t('sendMessage')}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={[styles.roundButton, styles.bottomButton]}
-              onPress={() => {
-                animateButton();
-                handleLogout();
-              }}
-            >
-              <View style={styles.iconWrapper}>
-                <Icon name="sign-out" size={24} color="#FFF" />
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-      ) : (
-        <View style={styles.buttonContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.rectangleButton}
-              onPress={() => {
-                animateButton();
-                navigation.navigate('Login');
-              }}
-            >
-              <Text style={styles.buttonText}>{t('login')}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.rectangleButton}
-              onPress={() => {
-                animateButton();
-                navigation.navigate('Register');
-              }}
-            >
-              <Text style={styles.buttonText}>{t('register')}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-      )}
-    </View>
+            </Animated.View>
+          </View>
+        )}
+        {isAuthenticated ? (
+          <View style={styles.buttonContainer}>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity
+                style={[styles.roundButton, styles.bottomButton]}
+                onPress={() => {
+                  animateButton();
+                  navigation.navigate('Profile');
+                }}
+              >
+                <View style={styles.iconWrapper}>
+                  <Icon name="user" size={24} color="#FFF" />
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity
+                style={styles.rectangleButton}
+                onPress={() => {
+                  animateButton();
+                  navigation.navigate('Messages');
+                }}
+              >
+                <Text style={styles.buttonText}>{t('sendMessage')}</Text>
+              </TouchableOpacity>
+            </Animated.View>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity
+                style={[styles.roundButton, styles.bottomButton]}
+                onPress={() => {
+                  animateButton();
+                  handleLogout();
+                }}
+              >
+                <View style={styles.iconWrapper}>
+                  <Icon name="sign-out" size={24} color="#FFF" />
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        ) : (
+          <View style={styles.buttonContainer}>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity
+                style={styles.rectangleButton}
+                onPress={() => {
+                  animateButton();
+                  navigation.navigate('Login');
+                }}
+              >
+                <Text style={styles.buttonText}>{t('login')}</Text>
+              </TouchableOpacity>
+            </Animated.View>
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <TouchableOpacity
+                style={styles.rectangleButton}
+                onPress={() => {
+                  animateButton();
+                  navigation.navigate('Register');
+                }}
+              >
+                <Text style={styles.buttonText}>{t('register')}</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        )}
+      </View>
+    </ImageBackground>
   </SafeAreaView>
 );
 }
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFACD',
   },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },  
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -352,13 +361,13 @@ modalTextItalic: {
     marginLeft: 20,
   },
   lottie: {
-    width: 300,
-    height: 300,
+    width: 450,
+    height: 450,
     position: 'absolute',
     top: '50%',
     left: '50%',
-    marginTop: -150,
-    marginLeft: -150,
+    marginTop: -225,
+    marginLeft: -225,
     zIndex: 1,
   },
   overlay: {
