@@ -4,6 +4,8 @@ import { AuthContext } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import { PermissionsAndroid, Platform } from 'react-native';
 
 export default function ArchivedMessagesScreen({ navigation }) {
   const { t } = useTranslation();
@@ -36,6 +38,49 @@ export default function ArchivedMessagesScreen({ navigation }) {
 
   const closeModal = () => {
     setSelectedMessage(null);
+  };
+
+  const createPDF = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'Permesso di scrittura',
+            message: 'L\'app ha bisogno del permesso di scrivere i file PDF',
+            buttonNeutral: 'Chiedimi più tardi',
+            buttonNegative: 'Annulla',
+            buttonPositive: 'OK',
+          }
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          alert('Permesso di scrittura non concesso');
+          return;
+        }
+      }
+
+      const htmlContent = `
+        <h1>${t('archivedMessages')}</h1>
+        <ul>
+          ${archivedMessages.map(msg => `
+            <li>
+              <strong>${msg.sender}:</strong> ${msg.message} <br>
+              <small>${msg.timestamp}</small>
+            </li>`).join('')}
+        </ul>
+      `;
+
+      const options = {
+        html: htmlContent,
+        fileName: 'archivedMessages',
+        directory: 'Documents',
+      };
+
+      const file = await RNHTMLtoPDF.convert(options);
+      alert(`PDF salvato in: ${file.filePath}`);
+    } catch (error) {
+      alert(`Errore durante la creazione del PDF: ${error.message}`);
+    }
   };
 
   return (
@@ -80,16 +125,24 @@ export default function ArchivedMessagesScreen({ navigation }) {
           </Modal>
         )}
         <View style={styles.bottomContainer}>
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => { animateButton(); navigation.goBack(); }}
-            >
-              <Text>
-                <Icon name="arrow-left" size={24} color="#FFF" /> {/* Icona back */}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => {
+              animateButton();
+              navigation.goBack();
+            }}
+          >
+            <Icon name="arrow-left" size={24} color="#FFF" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.pdfButton}
+            onPress={() => {
+              animateButton();
+              createPDF(); // Aggiusta qui per assicurarti che la funzione sia chiamata
+            }}
+          >
+            <Icon name="download" size={24} color="#FFF" />
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
@@ -103,49 +156,59 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'flex-start', // Allinea il contenuto in alto
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
-    marginTop: 60, // Assicura che sia sopra gli altri contenuti
+    marginTop: 60,
   },
   listContainer: {
     flex: 1,
     width: '100%',
-    paddingBottom: 80, // Aggiungi uno spazio inferiore sufficiente
+    paddingBottom: 80,
   },
   messageContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
   sender: {
     fontWeight: 'bold',
-    width: '20%', // Definisce una larghezza fissa per il mittente
+    width: '20%',
   },
   messageWrapper: {
-    width: '80%', // Definisce una larghezza fissa per il messaggio
+    width: '80%',
   },
   message: {
-    flexShrink: 1,
     flexWrap: 'wrap',
   },
   bottomContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    width: '100%',
+    justifyContent: 'space-between',
     position: 'absolute',
     bottom: 20,
+    width: '100%',
     paddingHorizontal: 20,
   },
   backButton: {
-    backgroundColor: '#32CD32', // Verde
-    borderRadius: 50, // Pulsante rotondo
+    backgroundColor: '#32CD32',
+    borderRadius: 30,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  pdfButton: {
+    backgroundColor: '#32CD32',
+    borderRadius: 30,
     width: 60,
     height: 60,
     justifyContent: 'center',
@@ -160,7 +223,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)', // Sfondo semitrasparente
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
     width: '80%',
@@ -181,8 +244,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   modalAlign: {
-    textAlign: 'left', // Giustifica a sinistra
-    alignSelf: 'stretch', // Assicura che il testo occupi tutta la larghezza
+    textAlign: 'left',
+    alignSelf: 'stretch',
   },
   closeButton: {
     marginTop: 20,

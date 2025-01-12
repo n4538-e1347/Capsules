@@ -103,7 +103,7 @@ return (
     >
       <View style={styles.container}>
         <TouchableOpacity
-          style={[styles.roundButton, styles.topLeftButton]}
+          style={[styles.roundButtonArchive, styles.topLeftButton]}
           onPress={() => {
             animateButton();
             navigation.navigate('ArchivedMessagesScreen');
@@ -114,7 +114,7 @@ return (
           </View>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.roundButton, styles.topRightButton]}
+          style={[styles.roundButtonSettings, styles.topRightButton]}
           onPress={() => {
             animateButton();
             navigation.navigate('SettingsScreen');
@@ -178,14 +178,14 @@ return (
           <View style={styles.buttonContainer}>
             <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
               <TouchableOpacity
-                style={[styles.roundButton, styles.bottomButton]}
+                style={[styles.roundButtonInvite, styles.bottomButton]}
                 onPress={() => {
                   animateButton();
                   navigation.navigate('Profile');
                 }}
               >
                 <View style={styles.iconWrapper}>
-                  <Icon name="user" size={24} color="#FFF" />
+                  <Icon name="user-plus" size={24} color="#FFF" />
                 </View>
               </TouchableOpacity>
             </Animated.View>
@@ -202,7 +202,7 @@ return (
             </Animated.View>
             <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
               <TouchableOpacity
-                style={[styles.roundButton, styles.bottomButton]}
+                style={[styles.roundButtonExit, styles.bottomButton]}
                 onPress={() => {
                   animateButton();
                   handleLogout();
@@ -299,6 +299,58 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 5,
   },
+  roundButtonArchive: {
+    backgroundColor: '#9932CC',
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  roundButtonSettings: {
+    backgroundColor: '#FFD700',
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  roundButtonExit: {
+    backgroundColor: '#FF0000',
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  }, 
+  roundButtonInvite: {
+    backgroundColor: '#00FF00',
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },  
   iconWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -309,7 +361,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rectangleButton: {
-    backgroundColor: '#32CD32',
+    backgroundColor: '#0000FF',
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 20,

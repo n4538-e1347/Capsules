@@ -18,6 +18,12 @@ export default function SettingsScreen({ navigation }) {
         <Text style={styles.title}>{t('settingsTitle')}</Text>
         <TouchableOpacity
           style={styles.button}
+          onPress={() => navigation.navigate('Profile')}
+        >
+          <Text style={styles.buttonText}>{t('profile')}</Text>
+        </TouchableOpacity>		
+        <TouchableOpacity
+          style={styles.button}
           onPress={() => navigation.navigate('LanguageScreen')}
         >
           <Text style={styles.buttonText}>{t('language')}</Text>
