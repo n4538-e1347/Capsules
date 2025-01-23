@@ -5,6 +5,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import LottieView from 'lottie-react-native';
+import { useFonts } from 'expo-font';
+import AppLoading from 'expo-app-loading';
 
 const { width, height } = Dimensions.get('window'); 
 
@@ -20,6 +22,7 @@ export default function HomeScreen({ navigation }) {
   const [randomMessage, setRandomMessage] = useState('');
   const [noMessagesModalVisible, setNoMessagesModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [logoutConfirmModalVisible, setLogoutConfirmModalVisible] = useState(false); // Aggiungi lo stato per il messaggio di conferma logout
   const animation = useRef(null);
 
   useEffect(() => {
@@ -66,7 +69,7 @@ export default function HomeScreen({ navigation }) {
     animation.current.play();
     setTimeout(() => {
       setModalVisible(true);
-      Animated.timing(scaleModalValue, { toValue: 1, duration: 500, useNativeDriver: true }).start();
+      Animated.timing(scaleModalValue, { toValue: 1, duration: 2500, useNativeDriver: true }).start();
     }, 3000); 
   };
 
@@ -94,6 +97,26 @@ export default function HomeScreen({ navigation }) {
     setNoMessagesModalVisible(false);
     scaleNoMessagesModalValue.setValue(0); // Reset della scala per l'animazione del messaggio "No More Capsules"
   };
+
+  // Funzioni per gestire il messaggio di conferma logout
+  const handleLogoutConfirmClose = () => {
+    setLogoutConfirmModalVisible(false);
+    scaleConfirmModalValue.setValue(0); // Reset della scala per l'animazione del messaggio di conferma logout
+  };
+
+  const handleLogoutConfirm = () => {
+    handleLogoutConfirmClose();
+    handleLogout();
+  };
+  
+  const [fontsLoaded] = useFonts({
+  'DancingScript': require('../assets/fonts/DancingScript-Regular.ttf'), // Adjust the path as needed
+});
+
+if (!fontsLoaded) {
+  return <AppLoading />;
+}
+
 
 return (
   <SafeAreaView style={styles.safeArea}>
@@ -142,7 +165,7 @@ return (
         {isModalVisible && (
           <View style={styles.overlay} pointerEvents="auto">
             <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleModalValue }] }]}>
-              <Text style={styles.modalTextItalic}>{randomMessage}</Text>
+              <Text style={styles.messageText}>{randomMessage}</Text>
               <TouchableOpacity onPress={handleModalClose}>
                 <Text style={styles.closeButton}>{t('close')}</Text>
               </TouchableOpacity>
@@ -168,6 +191,21 @@ return (
                   <Text style={styles.closeButton}>{t('cancel')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => { handleConfirmClose(); showRandomMessage(); }} style={styles.modalButtonRight}>
+                  <Text style={styles.closeButton}>{t('confirm')}</Text>
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+          </View>
+        )}
+        {logoutConfirmModalVisible && (
+          <View style={styles.overlay} pointerEvents="auto">
+            <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleConfirmModalValue }] }]}>
+              <Text style={styles.modalText}>{t('logoutPrompt')}</Text>
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity onPress={handleLogoutConfirmClose} style={styles.modalButtonLeft}>
+                  <Text style={styles.closeButton}>{t('cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleLogoutConfirm} style={styles.modalButtonRight}>
                   <Text style={styles.closeButton}>{t('confirm')}</Text>
                 </TouchableOpacity>
               </View>
@@ -205,7 +243,8 @@ return (
                 style={[styles.roundButtonExit, styles.bottomButton]}
                 onPress={() => {
                   animateButton();
-                  handleLogout();
+                  setLogoutConfirmModalVisible(true); // Mostra il messaggio di conferma logout
+                  Animated.timing(scaleConfirmModalValue, { toValue: 1, duration: 500, useNativeDriver: true }).start();
                 }}
               >
                 <View style={styles.iconWrapper}>
@@ -244,7 +283,7 @@ return (
     </ImageBackground>
   </SafeAreaView>
 );
-}
+}			
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -389,12 +428,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10,
   },
-modalTextItalic: {
-  fontSize: 18,
-  marginBottom: 10,
-  fontFamily: 'IndieFlower-Regular', // Use the font family for the handwriting effect
-  fontStyle: 'italic', // Optional: use to make the text italic
-},
+  modalTextItalic: {  //removable
+    fontSize: 18,
+    marginBottom: 10,
+    fontFamily: 'IndieFlower-Regular', // Use the font family for the handwriting effect
+    fontStyle: 'italic', // Optional: use to make the text italic
+  },
+  messageText: {
+    fontFamily: 'DancingScript', // Use the name you provided in useFonts
+    fontSize: 36,
+    color: 'black',
+	textAlign: 'center', 
+	margin: 10, 
+  },  
   closeButton: {
     fontSize: 18,
     color: '#32CD32',
