@@ -24,7 +24,8 @@ export default function HomeScreen({ navigation }) {
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [logoutConfirmModalVisible, setLogoutConfirmModalVisible] = useState(false); // Aggiungi lo stato per il messaggio di conferma logout
   const animation = useRef(null);
-
+  const [isAnimationPlaying, setIsAnimationPlaying] = useState(false);
+  
   useEffect(() => {
     if (user && user.username) {
       fetchMessages();
@@ -73,6 +74,14 @@ export default function HomeScreen({ navigation }) {
     }, 3000); 
   };
 
+  const handleOpenCapsule = () => {
+    setIsAnimationPlaying(true); // Bring animation to the front
+    animation.current.play(); // Start the animation
+    setTimeout(() => {
+      setIsAnimationPlaying(false); // Send animation to the back after completion
+    }, 3000); // Match the animation duration
+  };
+  
   const confirmOpenCapsule = () => {
     if (messages.length === 0) {
       setNoMessagesModalVisible(true);
@@ -118,6 +127,7 @@ if (!fontsLoaded) {
 }
 
 
+
 return (
   <SafeAreaView style={styles.safeArea}>
     <ImageBackground 
@@ -161,13 +171,18 @@ return (
           />
         </TouchableOpacity>
 
-        <LottieView
-          ref={animation}
-          source={require('../assets/animations/confetti.json')}
-          autoPlay={false}
-          loop={false}
-          style={styles.lottie}
-        />
+		<LottieView
+		  ref={animation}
+		  source={require('../assets/animations/confetti.json')}
+		  autoPlay={false}
+		  loop={false}
+		  style={[
+			styles.lottie,
+			{ zIndex: isAnimationPlaying ? 15 : 1 }, // Higher zIndex when playing
+		  ]}
+		  pointerEvents={isAnimationPlaying ? 'auto' : 'none'} // Prevent blocking button
+		/>
+
 
         {/* Modals */}
         {isModalVisible && (
@@ -198,9 +213,16 @@ return (
                 <TouchableOpacity onPress={handleConfirmClose} style={styles.modalButtonLeft}>
                   <Text style={styles.closeButton}>{t('cancel')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => { handleConfirmClose(); showRandomMessage(); }} style={styles.modalButtonRight}>
-                  <Text style={styles.closeButton}>{t('confirm')}</Text>
-                </TouchableOpacity>
+				<TouchableOpacity
+				  onPress={() => {
+					handleConfirmClose(); // Close the modal
+					handleOpenCapsule(); // Play animation
+					showRandomMessage(); // Display the message
+				  }}
+				  style={styles.modalButtonRight}
+				>
+				  <Text style={styles.closeButton}>{t('confirm')}</Text>
+				</TouchableOpacity>
               </View>
             </Animated.View>
           </View>
@@ -327,7 +349,7 @@ const styles = StyleSheet.create({
     height: 400, // Adjust height as needed for the button's size
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 2, // Ensures the button is above other elements
+    zIndex: 5, // Ensures the button is above other elements
   },
   largeButton: {
     width: '100%', // Ensure the image fills the clickable area
