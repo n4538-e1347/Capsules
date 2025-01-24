@@ -148,11 +148,11 @@ return (
           </View>
         </TouchableOpacity>
         <Text style={[styles.title, { marginTop: 60 }]}>{t('welcome')}</Text>
-        <TouchableOpacity onPress={confirmOpenCapsule}>
+        <TouchableOpacity style={styles.clickableArea} onPress={confirmOpenCapsule}>
           <Image 
             source={require('../assets/images/button_image.jpg')} 
             style={styles.largeButton} 
-            resizeMode="cover"
+            resizeMode="contain"
           />
         </TouchableOpacity>
         <LottieView
@@ -313,9 +313,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   largeButton: {
-    width: 280,
-    height: 450,
-    borderRadius: 10,
+    width: '100%', // Ensure the image fills the clickable area
+    height: '100%',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -468,15 +467,26 @@ const styles = StyleSheet.create({
     marginLeft: -225,
     zIndex: 1,
   },
+  clickableArea: {
+    width: 300, // Set the size of the clickable area
+    height: 500,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // Optional: add a border to visualize the area during debugging
+    //borderWidth: 1,
+    //borderColor: 'red',
+	zIndex: 1,
+  },
+  
   overlay: {
     position: 'absolute',
     top: 0,
     left: 0,
-    width,
-    height,
+    right: 0,  // Add this to ensure full horizontal coverage
+    bottom: 0, // Add this to ensure full vertical coverage
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 5, // Aggiungi zIndex per portare l'overlay in primo piano
+    zIndex: 5, // Keep this to ensure the overlay is on top
   },
 });
