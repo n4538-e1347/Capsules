@@ -148,20 +148,28 @@ return (
           </View>
         </TouchableOpacity>
         <Text style={[styles.title, { marginTop: 60 }]}>{t('welcome')}</Text>
-        <TouchableOpacity style={styles.clickableArea} onPress={confirmOpenCapsule}>
+
+        {/* Main Button */}
+        <TouchableOpacity 
+          style={styles.centeredButton} 
+          onPress={confirmOpenCapsule}
+        >
           <Image 
             source={require('../assets/images/button_image.jpg')} 
             style={styles.largeButton} 
             resizeMode="contain"
           />
         </TouchableOpacity>
+
         <LottieView
           ref={animation}
-          source={require('../assets/animations/confetti.json')} // Assicurati che il percorso sia corretto
+          source={require('../assets/animations/confetti.json')}
           autoPlay={false}
           loop={false}
           style={styles.lottie}
         />
+
+        {/* Modals */}
         {isModalVisible && (
           <View style={styles.overlay} pointerEvents="auto">
             <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleModalValue }] }]}>
@@ -212,6 +220,8 @@ return (
             </Animated.View>
           </View>
         )}
+
+        {/* Bottom Buttons */}
         {isAuthenticated ? (
           <View style={styles.buttonContainer}>
             <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
@@ -243,7 +253,7 @@ return (
                 style={[styles.roundButtonExit, styles.bottomButton]}
                 onPress={() => {
                   animateButton();
-                  setLogoutConfirmModalVisible(true); // Mostra il messaggio di conferma logout
+                  setLogoutConfirmModalVisible(true);
                   Animated.timing(scaleConfirmModalValue, { toValue: 1, duration: 500, useNativeDriver: true }).start();
                 }}
               >
@@ -283,7 +293,7 @@ return (
     </ImageBackground>
   </SafeAreaView>
 );
-}			
+}		
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -292,7 +302,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-  },  
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -311,6 +321,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
+  },
+  centeredButton: {
+    width: 300, // Adjust width as needed for the button's size
+    height: 400, // Adjust height as needed for the button's size
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2, // Ensures the button is above other elements
   },
   largeButton: {
     width: '100%', // Ensure the image fills the clickable area
@@ -375,7 +392,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
-  }, 
+  },
   roundButtonInvite: {
     backgroundColor: '#00FF00',
     borderRadius: 50,
@@ -388,7 +405,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
-  },  
+  },
   iconWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -420,26 +437,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    zIndex: 10, // Aggiungi zIndex per portare la modale in primo piano
-    width: width * 0.9, // Imposta la larghezza del messaggio
+    zIndex: 10,
+    width: '90%',
   },
   modalText: {
     fontSize: 18,
     marginBottom: 10,
   },
-  modalTextItalic: {  //removable
-    fontSize: 18,
-    marginBottom: 10,
-    fontFamily: 'IndieFlower-Regular', // Use the font family for the handwriting effect
-    fontStyle: 'italic', // Optional: use to make the text italic
-  },
   messageText: {
-    fontFamily: 'DancingScript', // Use the name you provided in useFonts
+    fontFamily: 'DancingScript',
     fontSize: 36,
     color: 'black',
-	textAlign: 'center', 
-	margin: 10, 
-  },  
+    textAlign: 'center',
+    margin: 10,
+  },
   closeButton: {
     fontSize: 18,
     color: '#32CD32',
@@ -467,26 +478,15 @@ const styles = StyleSheet.create({
     marginLeft: -225,
     zIndex: 1,
   },
-  clickableArea: {
-    width: 300, // Set the size of the clickable area
-    height: 500,
-    justifyContent: 'center',
-    alignItems: 'center',
-    // Optional: add a border to visualize the area during debugging
-    //borderWidth: 1,
-    //borderColor: 'red',
-	zIndex: 1,
-  },
-  
   overlay: {
     position: 'absolute',
     top: 0,
     left: 0,
-    right: 0,  // Add this to ensure full horizontal coverage
-    bottom: 0, // Add this to ensure full vertical coverage
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 5, // Keep this to ensure the overlay is on top
+    zIndex: 5,
   },
 });
