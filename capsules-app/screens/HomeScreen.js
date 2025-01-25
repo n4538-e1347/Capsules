@@ -185,16 +185,37 @@ return (
 
 
         {/* Modals */}
-        {isModalVisible && (
-          <View style={styles.overlay} pointerEvents="auto">
-            <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleModalValue }] }]}>
-              <Text style={styles.messageText}>{randomMessage}</Text>
-              <TouchableOpacity onPress={handleModalClose}>
-                <Text style={styles.closeButton}>{t('close')}</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
-        )}
+		{isModalVisible && (
+		  <View style={styles.overlay} pointerEvents="auto">
+			<Animated.View
+			  style={[
+				styles.modalContent,
+				{ transform: [{ scale: scaleModalValue }] },
+			  ]}
+			>
+			  {/* Decorations */}
+			  <Image
+				source={require('../assets/images/deco.png')}
+				style={[styles.decoration, styles.upperRightDecoration]}
+			  />
+			  <Image
+				source={require('../assets/images/deco.png')}
+				style={[
+				  styles.decoration,
+				  styles.lowerLeftDecoration,
+				  { transform: [{ rotate: '180deg' }] }, // Rotated for the lower left
+				]}
+			  />
+
+			  {/* Message Content */}
+			  <Text style={styles.messageText}>{randomMessage}</Text>
+			  <TouchableOpacity onPress={handleModalClose}>
+				<Text style={styles.closeButton}>{t('close')}</Text>
+			  </TouchableOpacity>
+			</Animated.View>
+		  </View>
+		)}
+
         {noMessagesModalVisible && (
           <View style={styles.overlay} pointerEvents="auto">
             <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleNoMessagesModalValue }] }]}>
@@ -205,14 +226,22 @@ return (
             </Animated.View>
           </View>
         )}
-        {confirmModalVisible && (
-          <View style={styles.overlay} pointerEvents="auto">
-            <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleConfirmModalValue }] }]}>
-              <Text style={styles.modalText}>{t('openCapsulePrompt')}</Text>
-              <View style={styles.modalButtonContainer}>
-                <TouchableOpacity onPress={handleConfirmClose} style={styles.modalButtonLeft}>
-                  <Text style={styles.closeButton}>{t('cancel')}</Text>
-                </TouchableOpacity>
+		{confirmModalVisible && (
+		  <View style={styles.overlay} pointerEvents="auto">
+			<Animated.View
+			  style={[
+				styles.modalContent,
+				{ transform: [{ scale: scaleConfirmModalValue }] },
+			  ]}
+			>
+			  {/* Message Text */}
+			  <Text style={styles.modalText}>{t('openCapsulePrompt')}</Text>
+
+			  {/* Buttons */}
+			  <View style={styles.modalButtonContainer}>
+				<TouchableOpacity onPress={handleConfirmClose} style={styles.modalButtonLeft}>
+				  <Text style={styles.closeButton}>{t('cancel')}</Text>
+				</TouchableOpacity>
 				<TouchableOpacity
 				  onPress={() => {
 					handleConfirmClose(); // Close the modal
@@ -223,10 +252,10 @@ return (
 				>
 				  <Text style={styles.closeButton}>{t('confirm')}</Text>
 				</TouchableOpacity>
-              </View>
-            </Animated.View>
-          </View>
-        )}
+			  </View>
+			</Animated.View>
+		  </View>
+		)}
         {logoutConfirmModalVisible && (
           <View style={styles.overlay} pointerEvents="auto">
             <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleConfirmModalValue }] }]}>
@@ -453,15 +482,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFF',
   },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-    zIndex: 10,
-    width: '90%',
-  },
   modalText: {
     fontSize: 18,
     marginBottom: 10,
@@ -511,4 +531,32 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     zIndex: 5,
   },
+decoration: {
+  position: 'absolute',
+  width: 100, // Fixed size for the decoration
+  height: 100, // Fixed size for the decoration
+  zIndex: 15, // Ensures decorations are above modal content
+  resizeMode: 'contain', // Maintain aspect ratio
+},
+upperRightDecoration: {
+  top: 10, // Fixed distance from the top
+  right: 10, // Fixed distance from the right edge
+},
+lowerLeftDecoration: {
+  bottom: 10, // Fixed distance from the bottom
+  left: 10, // Fixed distance from the left edge
+},
+modalContent: {
+  backgroundColor: 'white',
+  padding: 20,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 10,
+  zIndex: 10,
+  width: '90%',
+  maxWidth: 400, // Optional: to cap modal width
+  overflow: 'visible', // Prevent clipping of decorations
+},
+
+  
 });
