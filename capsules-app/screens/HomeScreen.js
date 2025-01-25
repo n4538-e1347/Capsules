@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import LottieView from 'lottie-react-native';
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
+import { Audio } from 'expo-av';
 
 const { width, height } = Dimensions.get('window'); 
 
@@ -25,13 +26,40 @@ export default function HomeScreen({ navigation }) {
   const [logoutConfirmModalVisible, setLogoutConfirmModalVisible] = useState(false); // Aggiungi lo stato per il messaggio di conferma logout
   const animation = useRef(null);
   const [isAnimationPlaying, setIsAnimationPlaying] = useState(false);
+  const clickSound = useRef(null);  
   
-  useEffect(() => {
-    if (user && user.username) {
-      fetchMessages();
-    }
-  }, []);
+useEffect(() => {
+  // Preload the sound
+  const loadSound = async () => {
+    const { sound } = await Audio.Sound.createAsync(
+      require('../assets/sounds/click.mp3')
+    );
+    clickSound.current = sound;
+  };
 
+  loadSound();
+
+  return () => {
+    if (clickSound.current) {
+      clickSound.current.unloadAsync(); // Unload sound on unmount
+    }
+  };
+}, []); // Fixed empty dependency array
+
+useEffect(() => {
+  // Fetch messages when the component mounts
+  if (user && user.username) {
+    fetchMessages();
+  }
+}, []); // Empty dependency array to run only once
+
+  // Function to play the preloaded sound
+  const playSound = async () => {
+    if (clickSound.current) {
+      await clickSound.current.replayAsync(); // Play the preloaded sound
+    }
+  };
+  
   const fetchMessages = async () => {
     try {
       const response = await axios.get(`http://192.168.1.14:3000/messages/${user.username}`);
@@ -138,6 +166,7 @@ return (
         <TouchableOpacity
           style={[styles.roundButtonArchive, styles.topLeftButton]}
           onPress={() => {
+			playSound(); // Play sound when button is clicked  
             animateButton();
             navigation.navigate('ArchivedMessagesScreen');
           }}
@@ -149,6 +178,7 @@ return (
         <TouchableOpacity
           style={[styles.roundButtonSettings, styles.topRightButton]}
           onPress={() => {
+			playSound();  
             animateButton();
             navigation.navigate('SettingsScreen');
           }}
@@ -160,16 +190,22 @@ return (
         <Text style={[styles.title, { marginTop: 60 }]}>{t('welcome')}</Text>
 
         {/* Main Button */}
-        <TouchableOpacity 
-          style={styles.centeredButton} 
-          onPress={confirmOpenCapsule}
-        >
-          <Image 
-            source={require('../assets/images/button_image.jpg')} 
-            style={styles.largeButton} 
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
+<TouchableOpacity 
+  style={styles.centeredButton} 
+  onPress={async () => {
+    if (clickSound.current) {
+      await clickSound.current.replayAsync(); // Play the sound
+    }
+    confirmOpenCapsule(); // Execute the original function
+  }}
+>
+  <Image 
+    source={require('../assets/images/button_image.jpg')} 
+    style={styles.largeButton} 
+    resizeMode="contain"
+  />
+</TouchableOpacity>
+
 
 		<LottieView
 		  ref={animation}
@@ -209,9 +245,17 @@ return (
 
 			  {/* Message Content */}
 			  <Text style={styles.messageText}>{randomMessage}</Text>
-			  <TouchableOpacity onPress={handleModalClose}>
-				<Text style={styles.closeButton}>{t('close')}</Text>
-			  </TouchableOpacity>
+<TouchableOpacity 
+  onPress={async () => {
+    if (clickSound.current) {
+      await clickSound.current.replayAsync(); // Play the sound
+    }
+    handleModalClose(); // Execute the original function
+  }}
+>
+  <Text style={styles.closeButton}>{t('close')}</Text>
+</TouchableOpacity>
+
 			</Animated.View>
 		  </View>
 		)}
@@ -220,9 +264,17 @@ return (
           <View style={styles.overlay} pointerEvents="auto">
             <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleNoMessagesModalValue }] }]}>
               <Text style={styles.modalText}>{t('NoMoreCapsules')}</Text>
-              <TouchableOpacity onPress={handleNoMessagesClose}>
-                <Text style={styles.closeButton}>{t('close')}</Text>
-              </TouchableOpacity>
+<TouchableOpacity 
+  onPress={async () => {
+    if (clickSound.current) {
+      await clickSound.current.replayAsync(); // Play the sound
+    }
+    handleNoMessagesClose(); // Execute the original function
+  }}
+>
+  <Text style={styles.closeButton}>{t('close')}</Text>
+</TouchableOpacity>
+
             </Animated.View>
           </View>
         )}
@@ -239,19 +291,32 @@ return (
 
 			  {/* Buttons */}
 			  <View style={styles.modalButtonContainer}>
-				<TouchableOpacity onPress={handleConfirmClose} style={styles.modalButtonLeft}>
-				  <Text style={styles.closeButton}>{t('cancel')}</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-				  onPress={() => {
-					handleConfirmClose(); // Close the modal
-					handleOpenCapsule(); // Play animation
-					showRandomMessage(); // Display the message
-				  }}
-				  style={styles.modalButtonRight}
-				>
-				  <Text style={styles.closeButton}>{t('confirm')}</Text>
-				</TouchableOpacity>
+<TouchableOpacity 
+  onPress={async () => {
+    if (clickSound.current) {
+      await clickSound.current.replayAsync(); // Play the sound
+    }
+    handleConfirmClose(); // Execute the original function
+  }} 
+  style={styles.modalButtonLeft}
+>
+  <Text style={styles.closeButton}>{t('cancel')}</Text>
+</TouchableOpacity>
+
+<TouchableOpacity
+  onPress={async () => {
+    if (clickSound.current) {
+      await clickSound.current.replayAsync(); // Play the sound
+    }
+    handleConfirmClose(); // Close the modal
+    handleOpenCapsule(); // Play animation
+    showRandomMessage(); // Display the message
+  }}
+  style={styles.modalButtonRight}
+>
+  <Text style={styles.closeButton}>{t('confirm')}</Text>
+</TouchableOpacity>
+
 			  </View>
 			</Animated.View>
 		  </View>
@@ -261,12 +326,30 @@ return (
             <Animated.View style={[styles.modalContent, { transform: [{ scale: scaleConfirmModalValue }] }]}>
               <Text style={styles.modalText}>{t('logoutPrompt')}</Text>
               <View style={styles.modalButtonContainer}>
-                <TouchableOpacity onPress={handleLogoutConfirmClose} style={styles.modalButtonLeft}>
-                  <Text style={styles.closeButton}>{t('cancel')}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleLogoutConfirm} style={styles.modalButtonRight}>
-                  <Text style={styles.closeButton}>{t('confirm')}</Text>
-                </TouchableOpacity>
+<TouchableOpacity
+  onPress={async () => {
+    if (clickSound.current) {
+      await clickSound.current.replayAsync(); // Play the sound
+    }
+    handleLogoutConfirmClose(); // Close the modal
+  }}
+  style={styles.modalButtonLeft}
+>
+  <Text style={styles.closeButton}>{t('cancel')}</Text>
+</TouchableOpacity>
+
+<TouchableOpacity
+  onPress={async () => {
+    if (clickSound.current) {
+      await clickSound.current.replayAsync(); // Play the sound
+    }
+    handleLogoutConfirm(); // Confirm logout
+  }}
+  style={styles.modalButtonRight}
+>
+  <Text style={styles.closeButton}>{t('confirm')}</Text>
+</TouchableOpacity>
+
               </View>
             </Animated.View>
           </View>
@@ -279,6 +362,7 @@ return (
               <TouchableOpacity
                 style={[styles.roundButtonInvite, styles.bottomButton]}
                 onPress={() => {
+				  playSound();	
                   animateButton();
                   navigation.navigate('Profile');
                 }}
@@ -292,6 +376,7 @@ return (
               <TouchableOpacity
                 style={styles.rectangleButton}
                 onPress={() => {
+				  playSound();	
                   animateButton();
                   navigation.navigate('Messages');
                 }}
@@ -303,6 +388,7 @@ return (
               <TouchableOpacity
                 style={[styles.roundButtonExit, styles.bottomButton]}
                 onPress={() => {
+				  playSound();	
                   animateButton();
                   setLogoutConfirmModalVisible(true);
                   Animated.timing(scaleConfirmModalValue, { toValue: 1, duration: 500, useNativeDriver: true }).start();
@@ -320,6 +406,7 @@ return (
               <TouchableOpacity
                 style={styles.rectangleButton}
                 onPress={() => {
+				  playSound();	
                   animateButton();
                   navigation.navigate('Login');
                 }}
@@ -331,6 +418,7 @@ return (
               <TouchableOpacity
                 style={styles.rectangleButton}
                 onPress={() => {
+				  playSound();	
                   animateButton();
                   navigation.navigate('Register');
                 }}
