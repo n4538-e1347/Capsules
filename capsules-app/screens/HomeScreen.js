@@ -27,7 +27,7 @@ export default function HomeScreen({ navigation }) {
   const animation = useRef(null);
   const [isAnimationPlaying, setIsAnimationPlaying] = useState(false);
   const clickSound = useRef(null);  
-  
+  const messageOpeningSound = useRef(null);  
 useEffect(() => {
   // Preload the sound
   const loadSound = async () => {
@@ -45,6 +45,22 @@ useEffect(() => {
     }
   };
 }, []); // Fixed empty dependency array
+
+useEffect(() => {
+  const loadSound = async () => {
+    const { sound } = await Audio.Sound.createAsync(
+      require('../assets/sounds/messageopening.mp3')
+    );
+    messageOpeningSound.current = sound;
+  };
+
+  loadSound();
+  return () => {
+    if (messageOpeningSound.current) {
+      messageOpeningSound.current.unloadAsync(); // Unload when component unmounts
+    }
+  };
+}, []);
 
 useEffect(() => {
   // Fetch messages when the component mounts
@@ -90,17 +106,29 @@ useEffect(() => {
     ]).start();
   };
 
-  const showRandomMessage = () => {
-    const randomIndex = Math.floor(Math.random() * messages.length);
-    const selectedMessage = messages[randomIndex];
-    setRandomMessage(selectedMessage.message);
-    archiveMessage(selectedMessage._id);
-    animation.current.play();
-    setTimeout(() => {
-      setModalVisible(true);
-      Animated.timing(scaleModalValue, { toValue: 1, duration: 2500, useNativeDriver: true }).start();
-    }, 3000); 
-  };
+const showRandomMessage = async () => {
+  const randomIndex = Math.floor(Math.random() * messages.length);
+  const selectedMessage = messages[randomIndex];
+  setRandomMessage(selectedMessage.message);
+  archiveMessage(selectedMessage._id);
+  animation.current.play();
+
+  // Add a delay before playing the sound
+  setTimeout(() => {
+    if (messageOpeningSound.current) {
+      messageOpeningSound.current.replayAsync();
+    }
+  }, 2500); 
+
+  setTimeout(() => {
+    setModalVisible(true);
+    Animated.timing(scaleModalValue, { 
+      toValue: 1, 
+      duration: 2500, 
+      useNativeDriver: true 
+    }).start();
+  }, 3000);
+};
 
   const handleOpenCapsule = () => {
     setIsAnimationPlaying(true); // Bring animation to the front
